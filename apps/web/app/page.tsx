@@ -15,10 +15,10 @@ export default function HomePage() {
         transition={{ duration: 0.5 }}
         className="text-center space-y-4"
       >
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-2xl font-bold sm:text-4xl">
           ASEANFlow — SWIFT-Free ASEAN Payments
         </h1>
-        <p className="text-xl text-muted-foreground">
+        <p className="text-lg text-muted-foreground sm:text-xl">
           Send PHP → IDR directly without SWIFT or USD
         </p>
       </motion.div>
@@ -33,7 +33,7 @@ export default function HomePage() {
           <Link href="/send">Send Money</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/demo">View Architecture</Link>
+          <Link href="/architecture">Architecture</Link>
         </Button>
       </motion.div>
 

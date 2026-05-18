@@ -172,7 +172,7 @@ description: |
       depends: PRP 02, PRP 03, PRP 07
       test: Enter 1000 PHP → see IDR → click Continue → redirect
 
-    PRP 09: [prp_09_transfer_timeline.md](./prp_09_transfer_timeline.md)
+    PRP 09: [prp_09_transfer_timeline.md](./prp_09_transfer_timeline.md) ✅ DONE
       scope: /transfer/[id] page — animated 7-state timeline, 1s polling, Morph proof component
       produces: apps/web/app/transfer/[id]/page.tsx, transfer-timeline.tsx, morph-proof.tsx
       depends: PRP 03, PRP 08

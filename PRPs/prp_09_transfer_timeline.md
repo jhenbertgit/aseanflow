@@ -44,14 +44,14 @@ description: |
 
   ### Success Criteria
 
-  - [ ] Timeline shows all 7 states, correct labels
-  - [ ] States animate as they progress (AnimatePresence)
-  - [ ] Polling starts at 1s interval
-  - [ ] Polling stops on MORPH_ANCHORED
-  - [ ] Morph proof appears after MORPH_ANCHORED
-  - [ ] Morph proof shows "Verified on Morph" badge + truncated hash
-  - [ ] Transfer details visible (send, receive, rate, fee)
-  - [ ] Handles invalid tracking code gracefully
+  - [x] Timeline shows all 7 states, correct labels
+  - [x] States animate as they progress (AnimatePresence)
+  - [x] Polling starts at 1s interval
+  - [x] Polling stops on MORPH_ANCHORED
+  - [x] Morph proof appears after MORPH_ANCHORED
+  - [x] Morph proof shows "Verified on Morph" badge + truncated hash
+  - [x] Transfer details visible (send, receive, rate, fee)
+  - [x] Handles invalid tracking code gracefully
 
   ## All Needed Context
 
@@ -271,12 +271,12 @@ description: |
 
   ## Final Validation Checklist
 
-  - [ ] No linting errors: `pnpm lint`
-  - [ ] TypeScript clean: `cd apps/web && pnpm typecheck`
-  - [ ] Timeline animates through all 7 states
-  - [ ] Polling stops on MORPH_ANCHORED
-  - [ ] Morph proof displays with badge + hash
-  - [ ] Invalid tracking code shows error
+  - [x] No linting errors: `pnpm lint`
+  - [x] TypeScript clean: `cd apps/web && pnpm typecheck`
+  - [x] Timeline animates through all 7 states
+  - [x] Polling stops on MORPH_ANCHORED
+  - [x] Morph proof displays with badge + hash
+  - [x] Invalid tracking code shows error
   - [ ] No layout shifts during animation
 
   ---

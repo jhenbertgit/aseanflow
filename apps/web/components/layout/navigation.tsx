@@ -9,7 +9,7 @@ import { useTheme } from "next-themes";
 
 const navItems = [
   { name: "Send", href: "/send", icon: Send },
-  { name: "Demo", href: "/demo", icon: Layout },
+  { name: "Architecture", href: "/architecture", icon: Layout },
 ];
 
 export function Navigation() {

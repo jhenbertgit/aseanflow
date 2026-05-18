@@ -50,6 +50,8 @@
       "unrs-resolver"
     ],
     "overrides": {
+      "@types/react": "19.2.2",
+      "@types/react-dom": "19.2.2",
       "validator": ">=13.15.20",
       "tmp": ">=0.2.4",
       "js-yaml": ">=4.1.1"

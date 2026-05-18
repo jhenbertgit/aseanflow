@@ -11,6 +11,7 @@ import { TransferModule } from './modules/transfer/transfer.module';
 import { SettlementModule } from './modules/settlement/settlement.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { MorphModule } from './modules/morph/morph.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MorphModule } from './modules/morph/morph.module';
     LedgerModule,
     SettlementModule,
     MorphModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

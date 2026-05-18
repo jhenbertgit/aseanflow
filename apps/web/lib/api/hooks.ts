@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createTransfer } from "./transfer";
+import { createTransfer, getTransferByTrackingCode } from "./transfer";
 import { getQuote } from "./quote";
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -36,5 +36,17 @@ export function useCreateTransfer() {
     onSuccess: (data) => {
       router.push(`/transfer/${data.trackingCode}`);
     },
+  });
+}
+
+export function useTransferStatus(trackingCode: string) {
+  return useQuery({
+    queryKey: ["transfer", trackingCode],
+    queryFn: () => getTransferByTrackingCode(trackingCode),
+    refetchInterval: (query) => {
+      if (query.state.data?.status === "MORPH_ANCHORED") return false;
+      return 1000;
+    },
+    enabled: !!trackingCode,
   });
 }

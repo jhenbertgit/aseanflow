@@ -4,9 +4,11 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
 COPY apps/worker/package.json ./apps/worker/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/redis/package.json ./packages/redis/
 COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/prettier-config/package.json ./packages/prettier-config/
@@ -14,28 +16,30 @@ RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/worker/node_modules ./apps/worker/node_modules
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=deps /app/packages ./packages
-COPY apps/worker ./apps/worker
+COPY apps/api ./apps/api
 COPY packages ./packages
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
-RUN pnpm --filter @aseanflow/database generate
-RUN pnpm --filter @aseanflow/worker build
+WORKDIR /app/apps/api
+RUN pnpm build
 
 FROM base AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 worker
+RUN adduser --system --uid 1001 api
 
-COPY --from=builder /app/apps/worker/dist ./dist
-COPY --from=builder /app/apps/worker/node_modules ./node_modules
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/node_modules ./node_modules
 COPY --from=builder /app/packages/database/generated ./packages/database/generated
 COPY --from=builder /app/node_modules ./node_modules_root
 COPY --from=builder /app/package.json ./
 
-USER worker
+USER api
+
+EXPOSE 3001
 
 CMD ["node", "dist/src/main.js"]

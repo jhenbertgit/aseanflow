@@ -18,6 +18,6 @@ import { FxService } from './fx.service';
     },
     FxService,
   ],
-  exports: [FxService],
+  exports: [FxService, 'REDIS_CLIENT'],
 })
 export class FxModule {}
