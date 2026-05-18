@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/main.ts",
+    "dev": "tsx watch -r dotenv/config src/main.ts",
     "start": "tsx src/main.ts",
     "build": "tsc",
     "lint": "eslint \"src/**/*.ts\"",
@@ -15,6 +15,7 @@
     "@aseanflow/database": "workspace:*",
     "@aseanflow/shared": "workspace:*",
     "bullmq": "^5.76.9",
+    "dotenv": "^16.4.7",
     "ethers": "^6.16.0"
   },
   "devDependencies": {

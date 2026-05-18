@@ -1,9 +1,9 @@
 import type { Job } from "bullmq";
 import { createHash } from "crypto";
 import { ethers } from "ethers";
-import { PrismaClient } from "@aseanflow/database";
+import { createPrismaClient } from "@aseanflow/database";
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 // Morph Hoodi Testnet
 const MORPH_RPC =

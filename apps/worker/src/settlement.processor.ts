@@ -1,8 +1,8 @@
 import type { Job } from "bullmq";
-import { PrismaClient } from "@aseanflow/database";
+import { createPrismaClient } from "@aseanflow/database";
 import type { TransferStatus } from "@aseanflow/database/generated/prisma";
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 const STATUS_ORDER: TransferStatus[] = [
   "CREATED",

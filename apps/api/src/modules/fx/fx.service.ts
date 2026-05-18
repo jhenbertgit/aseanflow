@@ -1,13 +1,22 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { RedisClientType } from '@aseanflow/redis';
+
+interface LiveResponse {
+  success: boolean;
+  quotes: Record<string, number>;
+  error?: { code: number; info: string };
+}
 
 @Injectable()
 export class FxService {
-  private readonly DEFAULT_RATE = 289.2;
+  private readonly FALLBACK_RATE = 289.2;
   private readonly CACHE_TTL = 30;
+  private readonly logger = new Logger(FxService.name);
 
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
+    private readonly configService: ConfigService,
   ) {}
 
   async getRate(from: string, to: string): Promise<number> {
@@ -15,9 +24,59 @@ export class FxService {
     const cached = await this.redis.get(cacheKey);
     if (cached) return parseFloat(cached);
 
-    const rate = this.DEFAULT_RATE;
+    const rate = await this.fetchLiveRate(from, to);
     await this.redis.setEx(cacheKey, this.CACHE_TTL, rate.toString());
     return rate;
+  }
+
+  private async fetchLiveRate(from: string, to: string): Promise<number> {
+    const apiKey = this.configService.get<string>('APILAYER_API_KEY');
+
+    if (!apiKey) {
+      this.logger.warn('APILAYER_API_KEY not set — using fallback rate');
+      return this.FALLBACK_RATE;
+    }
+
+    try {
+      const url = `https://api.apilayer.com/currency_data/live?base=${from}&symbols=${to}`;
+      const res = await fetch(url, {
+        headers: { apikey: apiKey },
+      });
+
+      if (!res.ok) {
+        this.logger.warn(`APILayer returned ${res.status} — using fallback rate`);
+        return this.FALLBACK_RATE;
+      }
+
+      const data = (await res.json()) as LiveResponse;
+
+      if (!data.success || !data.quotes) {
+        this.logger.warn('APILayer response unsuccessful — using fallback rate');
+        return this.FALLBACK_RATE;
+      }
+
+      const pair = `${from}${to}`;
+      const directRate = data.quotes[pair];
+      if (directRate && directRate > 0) {
+        this.logger.log(`Live ${pair} rate: ${directRate}`);
+        return directRate;
+      }
+
+      // API returns USD-based quotes — cross-calculate if direct pair absent
+      const usdFrom = data.quotes[`USD${from}`];
+      const usdTo = data.quotes[`USD${to}`];
+      if (usdFrom && usdTo && usdFrom > 0) {
+        const crossRate = usdTo / usdFrom;
+        this.logger.log(`Cross-calculated ${pair} rate: ${crossRate} (USD${to}=${usdTo} / USD${from}=${usdFrom})`);
+        return crossRate;
+      }
+
+      this.logger.warn(`No rate data for ${pair} — using fallback rate`);
+      return this.FALLBACK_RATE;
+    } catch (error) {
+      this.logger.warn(`APILayer fetch failed: ${error instanceof Error ? error.message : error} — using fallback rate`);
+      return this.FALLBACK_RATE;
+    }
   }
 
   async calculateQuote(amount: number, from: string, to: string) {
