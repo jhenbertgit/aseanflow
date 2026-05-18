@@ -16,6 +16,9 @@ out/
 # Turborepo
 .turbo/
 
+# TypeScript build info
+**/*.tsbuildinfo
+
 # Database
 *.db
 *.sqlite
