@@ -24,8 +24,8 @@ export function TransferTimeline({
   return (
     <div className="relative space-y-0">
       {TIMELINE_STEPS.map((step, index) => {
-        const isCompleted = index < currentIndex;
-        const isActive = index === currentIndex;
+        const isCompleted = index < currentIndex || (index === currentIndex && index === TIMELINE_STEPS.length - 1);
+        const isActive = index === currentIndex && !isCompleted;
 
         return (
           <motion.div

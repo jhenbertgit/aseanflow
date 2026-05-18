@@ -18,9 +18,14 @@ export function MorphProof({ txHash }: { txHash: string }) {
         <span className="text-lg">⛓️</span>
         <Badge className="bg-green-600 text-white">Verified on Morph</Badge>
       </div>
-      <p className="mt-2 font-mono text-sm text-muted-foreground">
-        {truncated}
-      </p>
+      <a
+        href={`https://explorer-hoodi.morph.network/tx/${txHash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2 inline-block font-mono text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {truncated} ↗
+      </a>
     </motion.div>
   );
 }
