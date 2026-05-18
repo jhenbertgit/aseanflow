@@ -1,0 +1,18 @@
+{
+  "extends": "@aseanflow/tsconfig/nestjs.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "types": ["jest", "node"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@aseanflow/database": ["../../packages/database/dist"],
+      "@aseanflow/shared": ["../../packages/shared/dist"],
+      "@aseanflow/redis": ["../../packages/redis/dist"],
+      "@aseanflow/auth": ["../../packages/auth/dist"]
+    },
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

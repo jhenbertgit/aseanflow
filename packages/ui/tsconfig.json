@@ -1,0 +1,19 @@
+{
+  "extends": "@aseanflow/tsconfig/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": [],
+    "paths": {
+      "@aseanflow/ui/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

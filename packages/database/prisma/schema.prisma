@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Currency {
+  PHP
+  IDR
+}
+
+enum TransferStatus {
+  CREATED
+  QUOTE_LOCKED
+  INSTA_PAY_PROCESSING
+  FX_CONVERSION
+  BI_FAST_PROCESSING
+  SETTLED
+  MORPH_ANCHORED
+}
+
+model Transfer {
+  id             String         @id @default(cuid())
+  trackingCode   String         @unique
+
+  sourceCurrency Currency
+  targetCurrency Currency
+
+  sendAmount     Decimal        @db.Decimal(18, 2)
+  receiveAmount  Decimal        @db.Decimal(18, 2)
+  exchangeRate   Decimal        @db.Decimal(18, 6)
+  fee            Decimal        @db.Decimal(18, 2)
+
+  status         TransferStatus
+
+  morphTxHash    String?
+  instapayRef    String?
+  bifastRef      String?
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  ledgerEntries  LedgerEntry[]
+
+  @@index([trackingCode])
+  @@map("transfers")
+}
+
+model LedgerEntry {
+  id         String   @id @default(cuid())
+  transferId String
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  debit      Decimal  @db.Decimal(18, 2)
+  credit     Decimal  @db.Decimal(18, 2)
+
+  currency   Currency
+
+  createdAt  DateTime @default(now())
+
+  @@index([transferId])
+  @@map("ledger_entries")
+}

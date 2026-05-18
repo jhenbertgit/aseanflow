@@ -1,0 +1,22 @@
+{
+  "people": [],
+  "projects": [
+    "@aseanflow/api",
+    "@aseanflow/database",
+    "@aseanflow/eslint-config",
+    "@aseanflow/monorepo",
+    "@aseanflow/prettier-config",
+    "@aseanflow/redis",
+    "@aseanflow/shared",
+    "@aseanflow/tsconfig",
+    "@aseanflow/ui",
+    "@aseanflow/web",
+    "TypeScript",
+    "Nest",
+    "Package",
+    "NextAuth",
+    "Passport",
+    "Node"
+  ],
+  "topics": []
+}

@@ -1,0 +1,17 @@
+{
+  "extends": "@aseanflow/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@aseanflow/database": ["../../packages/database/src"],
+      "@aseanflow/shared": ["../../packages/shared/src"]
+    },
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

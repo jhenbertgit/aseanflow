@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(source:*)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(ruff:*)",
+      "Bash(touch:*)",
+      "Bash(cat:*)",
+      "Bash(ruff check:*)",
+      "Read(*)",
+      "Bash(pnpm *)",
+      "Bash(docker *)",
+      "Bash(curl *)",
+      "Edit(*)",
+      "Bash(git *)",
+      "Bash(npx *)",
+      "Bash(dlx *)",
+      "mcp__plugin_mempalace_mempalace__*"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

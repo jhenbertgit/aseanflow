@@ -1,0 +1,124 @@
+{
+  "name": "aseanflow-monorepo",
+  "description": "ASEANFlow — SWIFT-free PHP→IDR cross-border payment system. Turborepo monorepo with Next.js 16 + NestJS 10.",
+  "plugins": {
+    "caveman@caveman": {
+      "version": "c2ed24b3e5d4",
+      "scope": "user",
+      "skills": ["caveman", "caveman-commit", "caveman-review", "caveman-compress", "caveman-help"],
+      "hooks": ["SessionStart", "UserPromptSubmit"]
+    },
+    "mempalace@mempalace": {
+      "version": "3.3.5",
+      "scope": "user",
+      "skills": ["mempalace"],
+      "subcommands": ["help", "init", "mine", "search", "status"]
+    }
+  },
+  "marketplace_skills": {
+    "prisma-upgrade-v7": {
+      "source": "prisma/skills",
+      "sourceType": "github"
+    }
+  },
+  "project_commands": {
+    "execute-prp": ".claude/commands/execute-prp.md",
+    "generate-prp": ".claude/commands/generate-prp.md"
+  },
+  "agents": {
+    "note": "webgenix-* agents are aspirational role names for agent_coordination flows, not actual installed agent definitions",
+    "roles": [
+      "webgenix-code-reviewer",
+      "webgenix-frontend-engineer",
+      "webgenix-backend-engineer",
+      "webgenix-code-debugger",
+      "webgenix-technical-lead",
+      "webgenix-devops-engineer",
+      "webgenix-qa-engineer"
+    ],
+    "default_agent": "webgenix-technical-lead"
+  },
+  "shared_context": {
+    "company": "Aseanflow",
+    "stack": "TN³PR + Turborepo",
+    "technologies": [
+      "TypeScript 5.9",
+      "Next.js 16 (App Router)",
+      "NestJS 10",
+      "Node.js ≥20",
+      "Prisma ORM 7",
+      "Redis",
+      "BullMQ",
+      "Turborepo",
+      "pnpm 10.20"
+    ],
+    "workspace_structure": {
+      "apps": ["web (Next.js 16, port 3000)", "api (NestJS 10, port 3001)"],
+      "packages": [
+        "ui (shadcn/ui)",
+        "shared (Zod schemas, types)",
+        "database (Prisma schema, client, seeds)",
+        "redis (Redis client config)",
+        "tsconfig (shared TS configs)",
+        "eslint-config (shared ESLint)",
+        "prettier-config (shared Prettier)"
+      ]
+    }
+  },
+  "global_files": [
+    "turbo.json",
+    "package.json",
+    "pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "eslint.config.mjs",
+    "docker-compose.dev.yml",
+    "docker-compose.prod.yml"
+  ],
+  "agent_coordination": {
+    "code_review_flow": ["webgenix-code-reviewer", "webgenix-technical-lead"],
+    "development_flow": [
+      "webgenix-frontend-engineer",
+      "webgenix-backend-engineer",
+      "webgenix-qa-engineer"
+    ],
+    "debugging_flow": ["webgenix-code-debugger", "webgenix-technical-lead"],
+    "deployment_flow": ["webgenix-devops-engineer", "webgenix-technical-lead"]
+  },
+  "standards": {
+    "typescript": "strict mode enabled",
+    "code_style": "@aseanflow/eslint-config",
+    "formatting": "@aseanflow/prettier-config",
+    "testing": "Jest (unit) + Playwright (e2e)",
+    "documentation": "JSDoc + CLAUDE.md per workspace",
+    "commits": "Conventional Commits",
+    "versioning": "Changesets",
+    "package_namespace": "@aseanflow"
+  },
+  "environment": {
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/aseanflow",
+    "REDIS_URL": "redis://localhost:6379",
+    "NEXT_PUBLIC_API_URL": "http://localhost:3001",
+    "NODE_ENV": "development"
+  },
+  "dev_commands": {
+    "install": "pnpm install",
+    "dev": "turbo run dev",
+    "dev_web": "pnpm dev --filter web",
+    "dev_api": "pnpm dev --filter api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint_fix": "turbo run lint:fix",
+    "type_check": "turbo run type-check",
+    "test": "turbo run test",
+    "test_e2e": "turbo run test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db_generate": "turbo run db:generate",
+    "db_push": "turbo run db:push",
+    "db_seed": "turbo run db:seed",
+    "db_studio": "cd packages/database && pnpm db:studio",
+    "docker_dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker_prod": "docker-compose -f docker-compose.prod.yml up --build",
+    "clean": "turbo run clean"
+  }
+}

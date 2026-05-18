@@ -1,0 +1,30 @@
+{
+  "name": "@aseanflow/redis",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "clean": "rm -rf dist .turbo node_modules"
+  },
+  "dependencies": {
+    "@aseanflow/shared": "workspace:*",
+    "redis": "^4.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@aseanflow/eslint-config": "workspace:*",
+    "@aseanflow/tsconfig": "workspace:*",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  }
+}

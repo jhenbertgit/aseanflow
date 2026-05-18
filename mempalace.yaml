@@ -1,0 +1,40 @@
+wing: aseanflow
+rooms:
+- name: apps
+  description: Files from apps/
+  keywords:
+  - apps
+  - apps
+- name: documentation
+  description: Files from docs/
+  keywords:
+  - documentation
+  - docs
+- name: packages
+  description: Files from packages/
+  keywords:
+  - packages
+  - packages
+- name: prps
+  description: Files from PRPs/
+  keywords:
+  - prps
+  - prps
+- name: scripts
+  description: Files from scripts/
+  keywords:
+  - scripts
+  - scripts
+- name: backend
+  description: Files from api/
+  keywords:
+  - backend
+  - api
+- name: frontend
+  description: Files from ui/
+  keywords:
+  - frontend
+  - ui
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

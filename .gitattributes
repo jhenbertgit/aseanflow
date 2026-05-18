@@ -1,0 +1,110 @@
+# Auto detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Source code
+*.ts text diff=typescript
+*.tsx text diff=typescript
+*.js text diff=javascript
+*.jsx text diff=javascript
+*.json text
+*.cjs text
+*.mjs text
+
+# Config files
+*.yaml text
+*.yml text
+*.toml text
+*.ini text
+*.config.* text
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.fish text eol=lf
+
+# Documentation
+*.md text
+*.txt text
+*.rst text
+
+# CSS and styles
+*.css text
+*.scss text
+*.sass text
+*.less text
+
+# Templates
+*.html text
+*.xml text
+
+# Image files - binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.webp binary
+
+# Fonts - binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+
+# Archives - binary
+*.zip binary
+*.tar.gz binary
+*.tgz binary
+*.rar binary
+*.7z binary
+
+# Database files - binary
+*.sqlite binary
+*.db binary
+*.db-shm binary
+*.db-wal binary
+*.prisma binary
+
+# Lock files - use Git LFS if available, otherwise treat as text
+package-lock.json text
+pnpm-lock.yaml text
+yarn.lock text
+
+# Generated files - binary or diff=false
+*.node binary
+*.dll binary
+*.dylib binary
+*.so binary
+
+# Build artifacts - exclude via gitignore but mark as binary if present
+*.jar binary
+*.war binary
+*.class binary
+
+# OS specific
+.DS_Store binary
+Thumbs.db binary
+
+# IDE specific
+*.swp binary
+*.swo binary
+*.bak binary
+
+# Logs
+*.log text
+
+# Certificates and keys - binary
+*.pem binary
+*.key binary
+*.crt binary
+*.p12 binary
+*.pfx binary
+
+# Windows specific (should be LF)
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

@@ -1,0 +1,58 @@
+{
+  "name": "@aseanflow/monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build lint test && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7",
+    "@aseanflow/eslint-config": "workspace:*",
+    "@aseanflow/prettier-config": "workspace:*",
+    "@aseanflow/tsconfig": "workspace:*",
+    "eslint": "^8.57.1",
+    "prettier": "^3.6.2",
+    "turbo": "latest",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "core-js-pure",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ],
+    "overrides": {
+      "validator": ">=13.15.20",
+      "tmp": ">=0.2.4",
+      "js-yaml": ">=4.1.1"
+    }
+  }
+}

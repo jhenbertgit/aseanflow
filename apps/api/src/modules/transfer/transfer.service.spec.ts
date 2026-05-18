@@ -1,0 +1,206 @@
+import { Test } from '@nestjs/testing';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TransferService } from './transfer.service';
+import { FxService } from '../fx/fx.service';
+import { PrismaService } from '../../common/services/prisma.service';
+
+describe('TransferService', () => {
+  let service: TransferService;
+  let prisma: {
+    transfer: {
+      create: jest.Mock;
+      findUnique: jest.Mock;
+      update: jest.Mock;
+    };
+  };
+  let fxService: { calculateQuote: jest.Mock };
+  let redis: { get: jest.Mock; setEx: jest.Mock };
+  let eventEmitter: { emit: jest.Mock };
+
+  beforeEach(async () => {
+    prisma = {
+      transfer: {
+        create: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+      },
+    };
+    fxService = { calculateQuote: jest.fn() };
+    redis = { get: jest.fn(), setEx: jest.fn() };
+    eventEmitter = { emit: jest.fn() };
+
+    const module = await Test.createTestingModule({
+      providers: [
+        TransferService,
+        { provide: PrismaService, useValue: prisma },
+        { provide: FxService, useValue: fxService },
+        { provide: 'REDIS_CLIENT', useValue: redis },
+        { provide: EventEmitter2, useValue: eventEmitter },
+      ],
+    }).compile();
+
+    service = module.get<TransferService>(TransferService);
+  });
+
+  describe('createTransfer', () => {
+    const quote = {
+      rate: 289.2,
+      fee: 10,
+      receiveAmount: 286308,
+      timestamp: Date.now(),
+    };
+    const mockTransfer = {
+      id: 'test-id',
+      trackingCode: 'TXNABC123DEF',
+      status: 'CREATED',
+    };
+
+    it('creates transfer with tracking code and CREATED status', async () => {
+      fxService.calculateQuote.mockResolvedValue(quote);
+      prisma.transfer.create.mockResolvedValue(mockTransfer);
+
+      const result = await service.createTransfer({
+        amount: 1000,
+        from: 'PHP',
+        to: 'IDR',
+      });
+
+      expect(result.trackingCode).toMatch(/^TXN/);
+      expect(result.status).toBe('CREATED');
+      expect(prisma.transfer.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'CREATED' }),
+        }),
+      );
+    });
+
+    it('prevents duplicate transfers with idempotency key', async () => {
+      redis.get.mockResolvedValue('TXNEXISTING123');
+      prisma.transfer.findUnique.mockResolvedValue({
+        trackingCode: 'TXNEXISTING123',
+        status: 'CREATED',
+        ledgerEntries: [],
+      });
+
+      const dto = {
+        amount: 1000,
+        from: 'PHP',
+        to: 'IDR',
+        idempotencyKey: 'test-uuid',
+      };
+      const result = await service.createTransfer(dto);
+
+      expect(result.trackingCode).toBe('TXNEXISTING123');
+      expect(prisma.transfer.create).not.toHaveBeenCalled();
+    });
+
+    it('stores idempotency key in Redis after creation', async () => {
+      redis.get.mockResolvedValue(null);
+      fxService.calculateQuote.mockResolvedValue(quote);
+      prisma.transfer.create.mockResolvedValue(mockTransfer);
+
+      await service.createTransfer({
+        amount: 1000,
+        from: 'PHP',
+        to: 'IDR',
+        idempotencyKey: 'test-uuid',
+      });
+
+      expect(redis.setEx).toHaveBeenCalledWith(
+        'transfer:idempotency:test-uuid',
+        60,
+        expect.stringMatching(/^TXN/),
+      );
+    });
+  });
+
+  describe('advanceStatus', () => {
+    it('advances to next linear state', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'CREATED',
+      });
+      prisma.transfer.update.mockResolvedValue({
+        id: 't1',
+        status: 'QUOTE_LOCKED',
+      });
+
+      const result = await service.advanceStatus('t1', 'QUOTE_LOCKED');
+
+      expect(result.status).toBe('QUOTE_LOCKED');
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'transfer.status.changed',
+        { transferId: 't1', newStatus: 'QUOTE_LOCKED' },
+      );
+    });
+
+    it('rejects skipping states', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'CREATED',
+      });
+
+      await expect(
+        service.advanceStatus('t1', 'BI_FAST_PROCESSING'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects backward transitions', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'FX_CONVERSION',
+      });
+
+      await expect(service.advanceStatus('t1', 'CREATED')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('rejects same-state transition', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'CREATED',
+      });
+
+      await expect(service.advanceStatus('t1', 'CREATED')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('throws NotFoundException for missing transfer', async () => {
+      prisma.transfer.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.advanceStatus('missing', 'QUOTE_LOCKED'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('getByTrackingCode', () => {
+    it('returns transfer with ledger entries', async () => {
+      const mockTransfer = {
+        trackingCode: 'TXNABC123DEF',
+        status: 'CREATED',
+        ledgerEntries: [],
+      };
+      prisma.transfer.findUnique.mockResolvedValue(mockTransfer);
+
+      const result = await service.getByTrackingCode('TXNABC123DEF');
+
+      expect(result.trackingCode).toBe('TXNABC123DEF');
+      expect(prisma.transfer.findUnique).toHaveBeenCalledWith({
+        where: { trackingCode: 'TXNABC123DEF' },
+        include: { ledgerEntries: true },
+      });
+    });
+
+    it('throws NotFoundException for invalid code', async () => {
+      prisma.transfer.findUnique.mockResolvedValue(null);
+
+      await expect(service.getByTrackingCode('INVALID')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+});

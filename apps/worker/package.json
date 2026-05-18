@@ -1,0 +1,31 @@
+{
+  "name": "@aseanflow/worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "build": "tsc",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo node_modules"
+  },
+  "dependencies": {
+    "@aseanflow/database": "workspace:*",
+    "@aseanflow/shared": "workspace:*",
+    "bullmq": "^5.76.9",
+    "ethers": "^6.16.0"
+  },
+  "devDependencies": {
+    "@aseanflow/tsconfig": "workspace:*",
+    "@eslint/js": "^9.38.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^9.38.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^15.15.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^7.18.0"
+  }
+}
