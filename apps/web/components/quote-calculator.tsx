@@ -13,7 +13,8 @@ import {
 } from "@aseanflow/ui/components/card";
 import { Input } from "@aseanflow/ui/components/input";
 
-import { useCreateTransfer, useQuote } from "@/lib/api/hooks";
+import { RewardBadge } from "@/components/reward-badge";
+import { useCreateTransfer, useQuote, useWallet } from "@/lib/api/hooks";
 
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 1_000_000;
@@ -21,7 +22,12 @@ const ETA_SECONDS = "~10 seconds";
 
 export function QuoteCalculator() {
   const [amount, setAmount] = useState<number>(1000);
-  const { data: quote, isLoading, error: quoteError } = useQuote(amount);
+  const [trackingCode, setTrackingCode] = useState("");
+  const { data: quote, isLoading, error: quoteError } = useQuote(
+    amount,
+    trackingCode || undefined,
+  );
+  const { data: wallet } = useWallet(trackingCode);
   const createTransfer = useCreateTransfer();
 
   const isAmountValid = amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
@@ -39,9 +45,16 @@ export function QuoteCalculator() {
     }
   }
 
+  function handleTrackingCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setTrackingCode(e.target.value.trim());
+  }
+
   function handleContinue() {
     if (!isAmountValid || isSubmitting) return;
-    createTransfer.mutate(amount);
+    createTransfer.mutate({
+      amount,
+      trackingCode: trackingCode || undefined,
+    });
   }
 
   const displayError = !isAmountValid && amount > 0;
@@ -78,6 +91,20 @@ export function QuoteCalculator() {
               {MAX_AMOUNT.toLocaleString()}
             </p>
           )}
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="trackingCode" className="text-sm font-medium">
+            Tracking code (optional)
+          </label>
+          <Input
+            id="trackingCode"
+            type="text"
+            value={trackingCode}
+            onChange={handleTrackingCodeChange}
+            placeholder="Enter tracking code for returning users"
+          />
+          {wallet && <RewardBadge balance={wallet.balance} />}
         </div>
 
         <AnimatePresence mode="wait">
@@ -125,6 +152,12 @@ export function QuoteCalculator() {
                 <span className="text-muted-foreground">ETA</span>
                 <span>{ETA_SECONDS}</span>
               </div>
+              {quote.discount?.applied && (
+                <div className="text-sm text-green-600">
+                  AFT Discount: -{quote.discount.percent}% fee (
+                  {quote.discount.reason})
+                </div>
+              )}
               <hr className="border-border" />
               <div className="flex justify-between font-semibold">
                 <span>They receive</span>

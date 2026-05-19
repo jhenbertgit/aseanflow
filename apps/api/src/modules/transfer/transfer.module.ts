@@ -3,8 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
 import { TransferController } from './transfer.controller';
 import { TransferService } from './transfer.service';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
+  imports: [WalletModule],
   controllers: [TransferController],
   providers: [
     TransferService,

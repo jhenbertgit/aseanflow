@@ -7,10 +7,11 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../common/services/prisma.service';
 import { FxService } from '../fx/fx.service';
+import { WalletService } from '../wallet/wallet.service';
 import type { RedisClientType } from '@aseanflow/redis';
-import type { TransferStatus } from '@aseanflow/database/generated/prisma';
+import { TransferStatus } from '@aseanflow/database';
 import { CreateTransferDto } from './dto/create-transfer.dto';
-import { Prisma } from '@aseanflow/database/generated/prisma';
+import { Prisma } from '@aseanflow/database';
 import { TransferEvents } from '../../events/transfer.events';
 
 const STATUS_ORDER: TransferStatus[] = [
@@ -28,6 +29,7 @@ export class TransferService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fxService: FxService,
+    private readonly walletService: WalletService,
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -42,10 +44,23 @@ export class TransferService {
       }
     }
 
+    let walletId: string | null = null;
+    if (dto.trackingCode) {
+      const existingWallet = await this.walletService.findByTrackingCode(
+        dto.trackingCode,
+      );
+      if (existingWallet) walletId = existingWallet.id;
+    }
+    if (!walletId) {
+      const wallet = await this.walletService.createWallet();
+      walletId = wallet.id;
+    }
+
     const quote = await this.fxService.calculateQuote(
       dto.amount,
       dto.from,
       dto.to,
+      dto.trackingCode,
     );
 
     const trackingCode = this.generateTrackingCode();
@@ -60,6 +75,7 @@ export class TransferService {
         exchangeRate: new Prisma.Decimal(quote.rate),
         fee: new Prisma.Decimal(quote.fee),
         status: 'CREATED',
+        walletId,
       },
     });
 
@@ -113,7 +129,7 @@ export class TransferService {
   async getByTrackingCode(trackingCode: string) {
     const transfer = await this.prisma.transfer.findUnique({
       where: { trackingCode },
-      include: { ledgerEntries: true },
+      include: { ledgerEntries: true, wallet: true },
     });
 
     if (!transfer) {

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { Button } from "@aseanflow/ui/components/button";
-import { Badge } from "@aseanflow/ui/components/badge";
 
 export default function HomePage() {
   return (
@@ -20,6 +19,9 @@ export default function HomePage() {
         </h1>
         <p className="text-lg text-muted-foreground sm:text-xl">
           Send PHP → IDR directly without SWIFT or USD
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Earn AFT reward tokens on every transfer
         </p>
       </motion.div>
 
@@ -41,12 +43,14 @@ export default function HomePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="flex gap-2"
+        className="flex flex-wrap justify-center gap-1.5"
       >
-        <Badge>Morph</Badge>
-        <Badge variant="secondary">NestJS</Badge>
-        <Badge variant="secondary">Docker</Badge>
-        <Badge variant="secondary">Redis</Badge>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="https://img.shields.io/badge/Morph-Anchor-blue" alt="Morph" />
+        <img src="https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs&logoColor=white" alt="Next.js" />
+        <img src="https://img.shields.io/badge/NestJS-10-red?logo=nestjs&logoColor=white" alt="NestJS" />
+        <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
+        <img src="https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white" alt="Redis" />
       </motion.div>
     </main>
   );

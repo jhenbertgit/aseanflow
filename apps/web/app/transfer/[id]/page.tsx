@@ -15,6 +15,7 @@ import {
 
 import { MorphProof } from "@/components/morph-proof";
 import { TransferTimeline } from "@/components/transfer-timeline";
+import { WalletInfo } from "@/components/wallet-info";
 import { useTransferStatus } from "@/lib/api/hooks";
 
 export default function TransferPage({
@@ -141,6 +142,16 @@ export default function TransferPage({
                   {transfer.morphTxHash && (
                     <MorphProof txHash={transfer.morphTxHash} />
                   )}
+
+                  {(transfer.status === "SETTLED" ||
+                    transfer.status === "MORPH_ANCHORED") &&
+                    transfer.walletAddress && (
+                      <WalletInfo
+                        address={transfer.walletAddress}
+                        balance={transfer.rewardAmount ? transfer.rewardAmount : "0"}
+                        symbol="AFT"
+                      />
+                    )}
                 </motion.div>
               )}
             </AnimatePresence>

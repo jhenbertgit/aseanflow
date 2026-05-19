@@ -2,9 +2,11 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createRedisClient } from '@aseanflow/redis';
 import { FxService } from './fx.service';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Global()
 @Module({
+  imports: [WalletModule],
   providers: [
     {
       provide: 'REDIS_CLIENT',

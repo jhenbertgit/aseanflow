@@ -32,4 +32,12 @@ export class CreateTransferDto {
   @IsOptional()
   @IsString()
   idempotencyKey?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Prior tracking code for returning users',
+  })
+  @IsOptional()
+  @IsString()
+  trackingCode?: string;
 }

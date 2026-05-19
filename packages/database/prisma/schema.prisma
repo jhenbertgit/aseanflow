@@ -40,10 +40,15 @@ model Transfer {
   instapayRef    String?
   bifastRef      String?
 
+  walletId       String?
+  rewardTxHash   String?
+  rewardAmount   Decimal?       @db.Decimal(48, 18)
+
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   ledgerEntries  LedgerEntry[]
+  wallet         Wallet?        @relation(fields: [walletId], references: [id])
 
   @@index([trackingCode])
   @@map("transfers")
@@ -63,4 +68,16 @@ model LedgerEntry {
 
   @@index([transferId])
   @@map("ledger_entries")
+}
+
+model Wallet {
+  id                  String     @id @default(cuid())
+  address             String     @unique
+  encryptedPrivateKey String
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  transfers           Transfer[]
+
+  @@index([address])
+  @@map("wallets")
 }

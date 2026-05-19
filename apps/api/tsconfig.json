@@ -6,12 +6,14 @@
     "types": ["jest", "node"],
     "paths": {
       "@/*": ["./src/*"],
-      "@aseanflow/database": ["../../packages/database/dist"],
+      "@aseanflow/database": ["../../packages/database/dist/src"],
       "@aseanflow/shared": ["../../packages/shared/dist"],
       "@aseanflow/redis": ["../../packages/redis/dist"],
       "@aseanflow/auth": ["../../packages/auth/dist"]
     },
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": false,
+    "declarationMap": false
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]

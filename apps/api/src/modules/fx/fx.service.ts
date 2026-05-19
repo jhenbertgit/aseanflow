@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { RedisClientType } from '@aseanflow/redis';
+import { WalletService } from '../wallet/wallet.service';
 
 interface LiveResponse {
   success: boolean;
@@ -17,6 +18,7 @@ export class FxService {
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
     private readonly configService: ConfigService,
+    private readonly walletService: WalletService,
   ) {}
 
   async getRate(from: string, to: string): Promise<number> {
@@ -44,14 +46,18 @@ export class FxService {
       });
 
       if (!res.ok) {
-        this.logger.warn(`APILayer returned ${res.status} — using fallback rate`);
+        this.logger.warn(
+          `APILayer returned ${res.status} — using fallback rate`,
+        );
         return this.FALLBACK_RATE;
       }
 
       const data = (await res.json()) as LiveResponse;
 
       if (!data.success || !data.quotes) {
-        this.logger.warn('APILayer response unsuccessful — using fallback rate');
+        this.logger.warn(
+          'APILayer response unsuccessful — using fallback rate',
+        );
         return this.FALLBACK_RATE;
       }
 
@@ -67,22 +73,55 @@ export class FxService {
       const usdTo = data.quotes[`USD${to}`];
       if (usdFrom && usdTo && usdFrom > 0) {
         const crossRate = usdTo / usdFrom;
-        this.logger.log(`Cross-calculated ${pair} rate: ${crossRate} (USD${to}=${usdTo} / USD${from}=${usdFrom})`);
+        this.logger.log(
+          `Cross-calculated ${pair} rate: ${crossRate} (USD${to}=${usdTo} / USD${from}=${usdFrom})`,
+        );
         return crossRate;
       }
 
       this.logger.warn(`No rate data for ${pair} — using fallback rate`);
       return this.FALLBACK_RATE;
     } catch (error) {
-      this.logger.warn(`APILayer fetch failed: ${error instanceof Error ? error.message : error} — using fallback rate`);
+      this.logger.warn(
+        `APILayer fetch failed: ${error instanceof Error ? error.message : String(error)} — using fallback rate`,
+      );
       return this.FALLBACK_RATE;
     }
   }
 
-  async calculateQuote(amount: number, from: string, to: string) {
+  async calculateQuote(
+    amount: number,
+    from: string,
+    to: string,
+    trackingCode?: string,
+  ) {
     const rate = await this.getRate(from, to);
-    const fee = 10;
+
+    let fee = 10;
+    let discount = { applied: false, percent: 0, reason: '' };
+
+    if (trackingCode) {
+      const wallet = await this.walletService.findByTrackingCode(trackingCode);
+      if (wallet) {
+        const balance = await this.walletService.getBalance(wallet.address);
+        const threshold = parseFloat(
+          this.configService.get('REWARD_FEE_DISCOUNT_THRESHOLD', '100'),
+        );
+        if (parseFloat(balance) >= threshold) {
+          const discountPercent = parseFloat(
+            this.configService.get('REWARD_FEE_DISCOUNT_PERCENT', '50'),
+          );
+          fee = fee * (1 - discountPercent / 100);
+          discount = {
+            applied: true,
+            percent: discountPercent,
+            reason: 'AFT holder discount',
+          };
+        }
+      }
+    }
+
     const receiveAmount = (amount - fee) * rate;
-    return { rate, fee, receiveAmount, timestamp: Date.now() };
+    return { rate, fee, receiveAmount, timestamp: Date.now(), discount };
   }
 }

@@ -1,4 +1,11 @@
-import { IsEnum, IsNumber, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateQuoteDto {
@@ -15,4 +22,12 @@ export class CreateQuoteDto {
   @ApiProperty({ example: 'IDR', enum: ['IDR'] })
   @IsEnum(['IDR'])
   to!: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Prior tracking code for fee discount',
+  })
+  @IsOptional()
+  @IsString()
+  trackingCode?: string;
 }

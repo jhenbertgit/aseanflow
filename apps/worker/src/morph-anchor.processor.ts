@@ -2,6 +2,7 @@ import type { Job } from "bullmq";
 import { createHash } from "crypto";
 import { ethers } from "ethers";
 import { createPrismaClient } from "@aseanflow/database";
+import { enqueueTx } from "./morph-tx-queue.js";
 
 const prisma = createPrismaClient();
 
@@ -64,10 +65,20 @@ async function submitReal(proofHash: string): Promise<{
 }> {
   const proofBytes = "0x" + proofHash;
 
+  const feeData = await provider!.getFeeData();
+  const maxFeePerGas = feeData.maxFeePerGas
+    ? (feeData.maxFeePerGas * 130n) / 100n
+    : undefined;
+  const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas
+    ? (feeData.maxPriorityFeePerGas * 130n) / 100n
+    : undefined;
+
   const tx = await wallet!.sendTransaction({
     to: wallet!.address,
     data: proofBytes,
     value: 0n,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
   });
 
   console.log(`[morph] Tx submitted: ${tx.hash}, waiting confirmation...`);
@@ -125,7 +136,7 @@ export async function processMorphAnchor(
   const proofHash = generateProof(transfer);
   job.log(`Proof hash: ${proofHash}`);
 
-  const result = await submitToMorph(proofHash);
+  const result = await enqueueTx(() => submitToMorph(proofHash));
   job.log(`Morph tx: ${result.txHash}`);
 
   await prisma.transfer.update({

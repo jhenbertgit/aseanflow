@@ -19,7 +19,12 @@ export class TransferController {
   @ApiOperation({ summary: 'Get FX quote' })
   @ApiResponse({ status: 201, description: 'Quote calculated' })
   async getQuote(@Body() dto: CreateQuoteDto) {
-    return this.fxService.calculateQuote(dto.amount, dto.from, dto.to);
+    return this.fxService.calculateQuote(
+      dto.amount,
+      dto.from,
+      dto.to,
+      dto.trackingCode,
+    );
   }
 
   @Post('transfer')

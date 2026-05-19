@@ -45,7 +45,9 @@
       "@tailwindcss/oxide",
       "core-js-pure",
       "esbuild",
+      "keccak",
       "prisma",
+      "secp256k1",
       "sharp",
       "unrs-resolver"
     ],

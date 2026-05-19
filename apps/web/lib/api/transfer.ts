@@ -7,11 +7,12 @@ export async function createTransfer(
   amount: number,
   from: string = "PHP",
   to: string = "IDR",
+  trackingCode?: string,
 ): Promise<TransferResponse> {
   const res = await fetch("/api/transfer", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, from, to }),
+    body: JSON.stringify({ amount, from, to, trackingCode }),
   });
 
   if (!res.ok) {

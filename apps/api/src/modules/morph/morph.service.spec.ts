@@ -55,20 +55,20 @@ describe('MorphService', () => {
   });
 
   describe('generateProof', () => {
-    it('produces deterministic SHA-256 proof hash', async () => {
+    it('produces deterministic SHA-256 proof hash', () => {
       const hash1 = service.generateProof(mockTransfer);
       const hash2 = service.generateProof(mockTransfer);
       expect(hash1).toBe(hash2);
       expect(hash1).toMatch(/^[a-f0-9]{64}$/);
     });
 
-    it('produces different hashes for different transfers', async () => {
+    it('produces different hashes for different transfers', () => {
       const hash1 = service.generateProof(mockTransfer);
       const hash2 = service.generateProof(mockTransfer2);
       expect(hash1).not.toBe(hash2);
     });
 
-    it('matches manual SHA-256 computation', async () => {
+    it('matches manual SHA-256 computation', () => {
       const payload = JSON.stringify({
         transferId: 'clx_test123',
         amountPHP: '1000.00',

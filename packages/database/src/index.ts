@@ -1,12 +1,11 @@
-import { PrismaClient } from "../generated/prisma/index.js";
+import { PrismaClient } from "../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 export { PrismaClient };
-export type { Prisma } from "../generated/prisma/index.js";
+export { Prisma } from "../generated/prisma/client.js";
+export { TransferStatus, Currency } from "../generated/prisma/enums.js";
 
-export function createPrismaClient(
-  options?: ConstructorParameters<typeof PrismaClient>[0],
-) {
+export function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error("DATABASE_URL environment variable is not set");
@@ -21,8 +20,5 @@ export function createPrismaClient(
     database: url.pathname.slice(1),
   });
 
-  return new PrismaClient({
-    ...options,
-    adapter,
-  });
+  return new PrismaClient({ adapter });
 }

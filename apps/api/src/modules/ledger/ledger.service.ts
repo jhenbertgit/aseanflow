@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/services/prisma.service';
-import { Prisma } from '@aseanflow/database/generated/prisma';
+import { Prisma } from '@aseanflow/database';
 
 @Injectable()
 export class LedgerService {

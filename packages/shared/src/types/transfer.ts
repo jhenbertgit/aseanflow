@@ -4,6 +4,7 @@ export const CreateQuoteSchema = z.object({
   amount: z.number().positive().max(1000000),
   from: z.enum(['PHP']),
   to: z.enum(['IDR']),
+  trackingCode: z.string().optional(),
 });
 
 export const CreateTransferSchema = z.object({
@@ -12,6 +13,7 @@ export const CreateTransferSchema = z.object({
   from: z.enum(['PHP']),
   to: z.enum(['IDR']),
   idempotencyKey: z.string().uuid().optional(),
+  trackingCode: z.string().optional(),
 });
 
 export type CreateQuoteRequest = z.infer<typeof CreateQuoteSchema>;
@@ -22,6 +24,7 @@ export interface QuoteResponse {
   fee: number;
   receiveAmount: number;
   timestamp: number;
+  discount?: { applied: boolean; percent: number; reason: string };
 }
 
 export interface TransferResponse {
@@ -39,6 +42,9 @@ export interface TransferDetailResponse {
   sourceCurrency: string;
   targetCurrency: string;
   morphTxHash: string | null;
+  walletAddress: string | null;
+  rewardTxHash: string | null;
+  rewardAmount: string | null;
   createdAt: string;
   updatedAt: string;
 }

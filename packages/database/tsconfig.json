@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "esnext",
@@ -23,6 +23,6 @@
     "allowJs": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "generated/prisma/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*", "prisma/**/*"]
 }
