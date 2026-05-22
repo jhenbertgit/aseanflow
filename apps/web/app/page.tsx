@@ -9,7 +9,7 @@ import { CtaSection } from "@/components/landing/cta-section";
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen bg-[var(--bg-deep)] text-[var(--text-primary)]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[var(--bg-deep)] text-[var(--text-primary)]">
       <MeshBackground />
       <div className="relative z-10">
         <HeroSection />

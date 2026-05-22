@@ -26,7 +26,7 @@ export default function TransferPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: trackingCode } = use(params);
-  const { data: transfer, isLoading, error, isFetching } = useTransferStatus(trackingCode);
+  const { data: transfer, isLoading, error } = useTransferStatus(trackingCode);
   const { data: wallet } = useWallet(trackingCode);
   const showLoading = isLoading && !transfer;
   const showError = !!error && !transfer;
@@ -40,7 +40,7 @@ export default function TransferPage({
         className="w-full max-w-md"
       >
         <Button asChild variant="ghost" size="sm">
-          <Link href="/">← Back</Link>
+          <Link href="/send">← Back</Link>
         </Button>
       </motion.div>
 

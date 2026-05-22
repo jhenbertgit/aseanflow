@@ -100,7 +100,7 @@ export function HeroSection() {
                   setError("");
                 }}
                 placeholder="Tracking code (TXN...)"
-                className="flex-1 border-[var(--border-glass)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[#64748b]"
+                className="flex-1 border-[var(--border-glass)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
               />
               <Button
                 type="submit"
