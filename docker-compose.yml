@@ -125,7 +125,7 @@ services:
     container_name: aseanflow-web
     restart: unless-stopped
     environment:
-      API_BASE_URL: ${API_BASE_URL:-https://api.localhost}
+      API_BASE_URL: http://api:3001
     labels:
       traefik.enable: "true"
       traefik.http.routers.web.rule: "Host(`${WEB_HOST:-localhost}`)"
