@@ -57,3 +57,6 @@ generated/
 test-results/
 playwright-report/
 coverage/
+
+# Superpowers
+.superpowers/
