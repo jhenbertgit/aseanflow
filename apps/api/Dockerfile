@@ -17,10 +17,18 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=deps /app/packages ./packages
+COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
+COPY --from=deps /app/packages/redis/node_modules ./packages/redis/node_modules
+COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY apps/api ./apps/api
 COPY packages ./packages
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+RUN cd packages/database && pnpm generate
+RUN cd packages/shared && pnpm build
+RUN cd packages/redis && pnpm build
+RUN cd packages/database && pnpm build
 
 WORKDIR /app/apps/api
 RUN pnpm build
