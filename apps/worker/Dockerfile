@@ -36,4 +36,4 @@ WORKDIR /app
 COPY --from=build /app/deploy .
 
 ENV NODE_ENV=production
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/apps/worker/src/main.js"]

@@ -67,6 +67,15 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      APILAYER_API_KEY: ${APILAYER_API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      MORPH_RPC_URL: ${MORPH_RPC_URL:-https://rpc-hoodi.morph.network}
+      MORPH_CHAIN_ID: ${MORPH_CHAIN_ID:-2910}
+      MORPH_PRIVATE_KEY: ${MORPH_PRIVATE_KEY:-}
+      REWARD_TOKEN_ADDRESS: ${REWARD_TOKEN_ADDRESS:-}
+      WALLET_ENCRYPTION_KEY: ${WALLET_ENCRYPTION_KEY:-}
+      REWARD_FEE_DISCOUNT_THRESHOLD: ${REWARD_FEE_DISCOUNT_THRESHOLD:-100}
+      REWARD_FEE_DISCOUNT_PERCENT: ${REWARD_FEE_DISCOUNT_PERCENT:-50}
     labels:
       traefik.enable: "true"
       traefik.http.routers.api.rule: "Host(`${API_HOST:-api.localhost}`)"
