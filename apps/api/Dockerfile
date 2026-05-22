@@ -33,8 +33,8 @@ RUN cd packages/database && pnpm build
 WORKDIR /app/apps/api
 RUN pnpm build
 
-# Create production deployment with flat node_modules (no symlinks)
-RUN pnpm deploy --prod /app/deploy
+WORKDIR /app
+RUN pnpm --filter @aseanflow/api deploy --prod /app/deploy
 
 FROM base AS runner
 ENV NODE_ENV=production

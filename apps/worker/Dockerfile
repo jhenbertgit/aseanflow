@@ -24,8 +24,8 @@ RUN pnpm --filter @aseanflow/database generate
 RUN pnpm --filter @aseanflow/worker build
 
 # Create production deployment with flat node_modules (no symlinks)
-WORKDIR /app/apps/worker
-RUN pnpm deploy --prod /app/deploy
+WORKDIR /app
+RUN pnpm --filter @aseanflow/worker deploy --prod /app/deploy
 
 FROM base AS runner
 ENV NODE_ENV=production
