@@ -9,4 +9,4 @@ RUN pnpm install --frozen-lockfile
 COPY packages/database/prisma ./packages/database/prisma
 COPY packages/database/prisma.config.ts ./packages/database/prisma.config.ts
 
-CMD ["./packages/database/node_modules/.bin/prisma", "migrate", "deploy", "--schema", "packages/database/prisma/schema.prisma"]
+CMD ["sh", "-c", "cd packages/database && npx prisma migrate deploy"]
