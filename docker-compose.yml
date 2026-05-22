@@ -103,6 +103,8 @@ services:
       MORPH_RPC_URL: ${MORPH_RPC_URL:-https://rpc-hoodi.morph.network}
       MORPH_CHAIN_ID: ${MORPH_CHAIN_ID:-2910}
       MORPH_PRIVATE_KEY: ${MORPH_PRIVATE_KEY:-}
+      REWARD_TOKEN_ADDRESS: ${REWARD_TOKEN_ADDRESS:-}
+      DEPLOYER_PRIVATE_KEY: ${DEPLOYER_PRIVATE_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
