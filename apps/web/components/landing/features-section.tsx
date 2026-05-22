@@ -6,7 +6,7 @@ const features = [
   {
     icon: "⚡",
     title: "SWIFT-Free",
-    desc: "No intermediary banks. Direct PHP to IDR corridor via Morph protocol.",
+    desc: "No intermediary banks. Direct PHP to IDR corridor. Powered by InstaPay - BI-FAST rails.",
   },
   {
     icon: "📊",
