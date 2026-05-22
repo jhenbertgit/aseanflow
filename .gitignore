@@ -50,9 +50,6 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Prisma
-generated/
-
 # Testing
 test-results/
 playwright-report/
@@ -60,3 +57,28 @@ coverage/
 
 # Superpowers
 .superpowers/
+
+# Apps
+apps/api/dist
+apps/api/build
+apps/api/logs
+apps/api/*.log
+apps/api/coverage
+apps/api/.nyc_output
+apps/api/.idea
+apps/api/.vscode/*
+apps/api/.temp
+apps/api/.tmp
+apps/api/pids
+apps/api/*.pid
+apps/api/*.seed
+apps/api/*.pid.lock
+
+apps/worker/contracts/artifacts
+apps/worker/contracts/cache
+apps/worker/contracts/typechain-types
+
+packages/database/generated/prisma
+packages/database/prisma/*.js
+packages/database/prisma/*.d.ts
+packages/database/prisma/*.map
