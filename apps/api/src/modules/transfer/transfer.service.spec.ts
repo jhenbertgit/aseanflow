@@ -4,6 +4,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TransferService } from './transfer.service';
 import { FxService } from '../fx/fx.service';
 import { PrismaService } from '../../common/services/prisma.service';
+import { WalletService } from '../wallet/wallet.service';
 
 describe('TransferService', () => {
   let service: TransferService;
@@ -17,6 +18,7 @@ describe('TransferService', () => {
   let fxService: { calculateQuote: jest.Mock };
   let redis: { get: jest.Mock; setEx: jest.Mock };
   let eventEmitter: { emit: jest.Mock };
+  let walletService: { findByTrackingCode: jest.Mock; createWallet: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
@@ -29,6 +31,10 @@ describe('TransferService', () => {
     fxService = { calculateQuote: jest.fn() };
     redis = { get: jest.fn(), setEx: jest.fn() };
     eventEmitter = { emit: jest.fn() };
+    walletService = {
+      findByTrackingCode: jest.fn().mockResolvedValue(null),
+      createWallet: jest.fn().mockResolvedValue({ id: 'wallet-1' }),
+    };
 
     const module = await Test.createTestingModule({
       providers: [
@@ -37,6 +43,7 @@ describe('TransferService', () => {
         { provide: FxService, useValue: fxService },
         { provide: 'REDIS_CLIENT', useValue: redis },
         { provide: EventEmitter2, useValue: eventEmitter },
+        { provide: WalletService, useValue: walletService },
       ],
     }).compile();
 
@@ -56,7 +63,7 @@ describe('TransferService', () => {
       status: 'CREATED',
     };
 
-    it('creates transfer with tracking code and CREATED status', async () => {
+    it('creates PHP→IDR transfer with tracking code and CREATED status', async () => {
       fxService.calculateQuote.mockResolvedValue(quote);
       prisma.transfer.create.mockResolvedValue(mockTransfer);
 
@@ -70,7 +77,40 @@ describe('TransferService', () => {
       expect(result.status).toBe('CREATED');
       expect(prisma.transfer.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ status: 'CREATED' }),
+          data: expect.objectContaining({
+            status: 'CREATED',
+            sourceCurrency: 'PHP',
+            targetCurrency: 'IDR',
+          }),
+        }),
+      );
+    });
+
+    it('creates IDR→PHP transfer with correct currencies', async () => {
+      const idrToPhpQuote = {
+        rate: 0.003456,
+        fee: 10,
+        receiveAmount: 1726.8,
+        timestamp: Date.now(),
+      };
+      fxService.calculateQuote.mockResolvedValue(idrToPhpQuote);
+      prisma.transfer.create.mockResolvedValue(mockTransfer);
+
+      const result = await service.createTransfer({
+        amount: 500_000,
+        from: 'IDR',
+        to: 'PHP',
+      });
+
+      expect(result.trackingCode).toMatch(/^TXN/);
+      expect(result.status).toBe('CREATED');
+      expect(prisma.transfer.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            status: 'CREATED',
+            sourceCurrency: 'IDR',
+            targetCurrency: 'PHP',
+          }),
         }),
       );
     });
@@ -120,6 +160,7 @@ describe('TransferService', () => {
       prisma.transfer.findUnique.mockResolvedValue({
         id: 't1',
         status: 'CREATED',
+        sourceCurrency: 'PHP',
       });
       prisma.transfer.update.mockResolvedValue({
         id: 't1',
@@ -131,7 +172,11 @@ describe('TransferService', () => {
       expect(result.status).toBe('QUOTE_LOCKED');
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'transfer.status.changed',
-        { transferId: 't1', newStatus: 'QUOTE_LOCKED' },
+        expect.objectContaining({
+          transferId: 't1',
+          oldStatus: 'CREATED',
+          newStatus: 'QUOTE_LOCKED',
+        }),
       );
     });
 
@@ -139,6 +184,7 @@ describe('TransferService', () => {
       prisma.transfer.findUnique.mockResolvedValue({
         id: 't1',
         status: 'CREATED',
+        sourceCurrency: 'PHP',
       });
 
       await expect(
@@ -150,6 +196,7 @@ describe('TransferService', () => {
       prisma.transfer.findUnique.mockResolvedValue({
         id: 't1',
         status: 'FX_CONVERSION',
+        sourceCurrency: 'PHP',
       });
 
       await expect(service.advanceStatus('t1', 'CREATED')).rejects.toThrow(
@@ -161,6 +208,7 @@ describe('TransferService', () => {
       prisma.transfer.findUnique.mockResolvedValue({
         id: 't1',
         status: 'CREATED',
+        sourceCurrency: 'PHP',
       });
 
       await expect(service.advanceStatus('t1', 'CREATED')).rejects.toThrow(
@@ -174,6 +222,34 @@ describe('TransferService', () => {
       await expect(
         service.advanceStatus('missing', 'QUOTE_LOCKED'),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('allows BI-FAST before InstaPay for IDR→PHP', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'QUOTE_LOCKED',
+        sourceCurrency: 'IDR',
+      });
+      prisma.transfer.update.mockResolvedValue({
+        id: 't1',
+        status: 'BI_FAST_PROCESSING',
+      });
+
+      const result = await service.advanceStatus('t1', 'BI_FAST_PROCESSING');
+
+      expect(result.status).toBe('BI_FAST_PROCESSING');
+    });
+
+    it('rejects InstaPay after QUOTE_LOCKED for IDR→PHP', async () => {
+      prisma.transfer.findUnique.mockResolvedValue({
+        id: 't1',
+        status: 'QUOTE_LOCKED',
+        sourceCurrency: 'IDR',
+      });
+
+      await expect(
+        service.advanceStatus('t1', 'INSTA_PAY_PROCESSING'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -191,7 +267,7 @@ describe('TransferService', () => {
       expect(result.trackingCode).toBe('TXNABC123DEF');
       expect(prisma.transfer.findUnique).toHaveBeenCalledWith({
         where: { trackingCode: 'TXNABC123DEF' },
-        include: { ledgerEntries: true },
+        include: { ledgerEntries: true, wallet: true },
       });
     });
 

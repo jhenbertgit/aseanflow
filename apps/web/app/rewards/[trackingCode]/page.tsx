@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@aseanflow/ui/components/card";
 
+import { LoadingState } from "@/components/ui/loading-state";
 import { MintHistory } from "@/components/mint-history";
 import { WalletInfo } from "@/components/wallet-info";
 import { useWallet, useWalletHistory } from "@/lib/api/hooks";
@@ -24,6 +25,7 @@ export default function RewardsPage({
   const { trackingCode } = use(params);
   const { data: wallet, isLoading, error } = useWallet(trackingCode);
   const { data: history } = useWalletHistory(trackingCode);
+  const [showAll, setShowAll] = useState(false);
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-6 p-8">
@@ -48,9 +50,7 @@ export default function RewardsPage({
             <CardTitle className="text-lg">AFT Rewards</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isLoading && (
-              <p className="text-sm text-muted-foreground">Loading...</p>
-            )}
+            {isLoading && <LoadingState size="sm" />}
             {error && (
               <p className="text-sm text-destructive">Wallet not found</p>
             )}
@@ -59,9 +59,19 @@ export default function RewardsPage({
                 <WalletInfo
                   address={wallet.address}
                   balance={wallet.balance}
-                  symbol={wallet.symbol}
                 />
-                {history && <MintHistory rewards={history.rewards} />}
+                {history && (
+                  <MintHistory
+                    rewards={
+                      showAll
+                        ? history.rewards
+                        : history.rewards.slice(0, 3)
+                    }
+                    totalCount={history.rewards.length}
+                    showAll={showAll}
+                    onToggle={() => setShowAll((v) => !v)}
+                  />
+                )}
               </>
             )}
           </CardContent>

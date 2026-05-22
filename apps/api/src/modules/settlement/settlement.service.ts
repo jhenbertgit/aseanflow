@@ -21,24 +21,56 @@ export class SettlementService {
   async orchestrate(transferId: string): Promise<void> {
     await this.transferService.advanceStatus(transferId, 'QUOTE_LOCKED');
 
-    const instapayResult = await this.instapay.simulate();
-    await this.prisma.transfer.update({
+    const transfer = await this.prisma.transfer.findUnique({
       where: { id: transferId },
-      data: { instapayRef: instapayResult.reference },
     });
-    await this.transferService.advanceStatus(
-      transferId,
-      'INSTA_PAY_PROCESSING',
-    );
+    const isIdrToPhp = transfer?.sourceCurrency === 'IDR';
 
-    await this.transferService.advanceStatus(transferId, 'FX_CONVERSION');
+    if (isIdrToPhp) {
+      const bifastResult = await this.bifast.simulate();
+      await this.prisma.transfer.update({
+        where: { id: transferId },
+        data: { bifastRef: bifastResult.reference },
+      });
+      await this.transferService.advanceStatus(
+        transferId,
+        'BI_FAST_PROCESSING',
+      );
 
-    const bifastResult = await this.bifast.simulate();
-    await this.prisma.transfer.update({
-      where: { id: transferId },
-      data: { bifastRef: bifastResult.reference },
-    });
-    await this.transferService.advanceStatus(transferId, 'BI_FAST_PROCESSING');
+      await this.transferService.advanceStatus(transferId, 'FX_CONVERSION');
+
+      const instapayResult = await this.instapay.simulate();
+      await this.prisma.transfer.update({
+        where: { id: transferId },
+        data: { instapayRef: instapayResult.reference },
+      });
+      await this.transferService.advanceStatus(
+        transferId,
+        'INSTA_PAY_PROCESSING',
+      );
+    } else {
+      const instapayResult = await this.instapay.simulate();
+      await this.prisma.transfer.update({
+        where: { id: transferId },
+        data: { instapayRef: instapayResult.reference },
+      });
+      await this.transferService.advanceStatus(
+        transferId,
+        'INSTA_PAY_PROCESSING',
+      );
+
+      await this.transferService.advanceStatus(transferId, 'FX_CONVERSION');
+
+      const bifastResult = await this.bifast.simulate();
+      await this.prisma.transfer.update({
+        where: { id: transferId },
+        data: { bifastRef: bifastResult.reference },
+      });
+      await this.transferService.advanceStatus(
+        transferId,
+        'BI_FAST_PROCESSING',
+      );
+    }
 
     await this.transferService.advanceStatus(transferId, 'SETTLED');
 

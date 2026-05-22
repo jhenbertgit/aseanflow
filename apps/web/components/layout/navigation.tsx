@@ -22,7 +22,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-lg font-bold text-emerald-600 tracking-tight">
+            <span className="text-lg font-bold text-primary tracking-tight">
               ASEANFlow
             </span>
           </Link>
@@ -37,7 +37,7 @@ export function Navigation() {
                   href={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-emerald-600 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
@@ -81,7 +81,7 @@ export function Navigation() {
                   onClick={() => setIsMenuOpen(false)}
                   className={`flex items-center gap-3 p-3 rounded-lg ${
                     isActive
-                      ? "bg-emerald-600 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "hover:bg-muted"
                   }`}
                 >

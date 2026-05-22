@@ -16,6 +16,8 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '^@aseanflow/database$': '<rootDir>/../test/mocks/database.ts',
+    '^@prisma/client/runtime/library$': '<rootDir>/../test/mocks/prisma-decimal.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
 };

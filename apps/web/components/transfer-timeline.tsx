@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const TIMELINE_STEPS = [
+const BASE_STEPS = [
   { status: "CREATED", label: "Transfer Created" },
   { status: "QUOTE_LOCKED", label: "Rate Locked" },
   { status: "INSTA_PAY_PROCESSING", label: "InstaPay Processing" },
@@ -12,19 +12,33 @@ const TIMELINE_STEPS = [
   { status: "MORPH_ANCHORED", label: "Proof Anchored" },
 ] as const;
 
+function getSteps(sourceCurrency?: string) {
+  if (sourceCurrency === "IDR") {
+    return [
+      BASE_STEPS[0], BASE_STEPS[1],
+      BASE_STEPS[4], BASE_STEPS[3], BASE_STEPS[2],
+      BASE_STEPS[5], BASE_STEPS[6],
+    ];
+  }
+  return BASE_STEPS;
+}
+
 export function TransferTimeline({
   currentStatus,
+  sourceCurrency,
 }: {
   currentStatus: string;
+  sourceCurrency?: string;
 }) {
-  const currentIndex = TIMELINE_STEPS.findIndex(
+  const steps = getSteps(sourceCurrency);
+  const currentIndex = steps.findIndex(
     (s) => s.status === currentStatus,
   );
 
   return (
     <div className="relative space-y-0">
-      {TIMELINE_STEPS.map((step, index) => {
-        const isCompleted = index < currentIndex || (index === currentIndex && index === TIMELINE_STEPS.length - 1);
+      {steps.map((step, index) => {
+        const isCompleted = index < currentIndex || (index === currentIndex && index === steps.length - 1);
         const isActive = index === currentIndex && !isCompleted;
 
         return (
@@ -39,18 +53,18 @@ export function TransferTimeline({
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                   isCompleted
-                    ? "bg-green-500 text-white"
+                    ? "bg-primary text-primary-foreground"
                     : isActive
-                      ? "bg-blue-500 text-white animate-pulse"
-                      : "bg-gray-200 text-gray-500"
+                      ? "bg-accent text-accent-foreground animate-pulse"
+                      : "bg-muted text-muted-foreground"
                 }`}
               >
                 {isCompleted ? "✓" : isActive ? "⏳" : index + 1}
               </div>
-              {index < TIMELINE_STEPS.length - 1 && (
+              {index < steps.length - 1 && (
                 <div
                   className={`h-8 w-0.5 ${
-                    isCompleted ? "bg-green-500" : "bg-gray-200"
+                    isCompleted ? "bg-primary" : "bg-muted"
                   }`}
                 />
               )}
@@ -59,10 +73,10 @@ export function TransferTimeline({
               <span
                 className={`text-sm font-medium ${
                   isCompleted
-                    ? "text-green-600"
+                    ? "text-primary"
                     : isActive
-                      ? "text-blue-600"
-                      : "text-gray-400"
+                      ? "text-accent"
+                      : "text-muted-foreground"
                 }`}
               >
                 {step.label}

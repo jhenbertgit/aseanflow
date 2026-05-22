@@ -7,6 +7,31 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from 'class-validator';
+
+function CurrenciesDiffer(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'currenciesDiffer',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: unknown, args: ValidationArguments) {
+          const obj = args.object as { from?: string; to?: string };
+          return obj.from !== obj.to;
+        },
+        defaultMessage() {
+          return 'Source and target currencies must differ';
+        },
+      },
+    });
+  };
+}
 
 export class CreateTransferDto {
   @ApiProperty({ example: 1000, description: 'Amount in source currency' })
@@ -15,12 +40,13 @@ export class CreateTransferDto {
   @Max(1000000)
   amount!: number;
 
-  @ApiProperty({ example: 'PHP', enum: ['PHP'] })
-  @IsEnum(['PHP'])
+  @ApiProperty({ example: 'PHP', enum: ['PHP', 'IDR'] })
+  @IsEnum(['PHP', 'IDR'])
   from!: string;
 
-  @ApiProperty({ example: 'IDR', enum: ['IDR'] })
-  @IsEnum(['IDR'])
+  @ApiProperty({ example: 'IDR', enum: ['PHP', 'IDR'] })
+  @IsEnum(['PHP', 'IDR'])
+  @CurrenciesDiffer({ message: 'Source and target currencies must differ' })
   to!: string;
 
   @ApiProperty({ required: false })

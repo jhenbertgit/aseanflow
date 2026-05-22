@@ -10,15 +10,13 @@ import {
   CardTitle,
 } from "@aseanflow/ui/components/card";
 
+import { MORPH_EXPLORER } from "@/lib/constants";
 import { RewardBadge } from "./reward-badge";
 
 interface WalletInfoProps {
   address: string;
   balance: string;
-  symbol: string;
 }
-
-const MORPH_EXPLORER = "https://explorer-hoodi.morph.network";
 
 export function WalletInfo({ address, balance }: WalletInfoProps) {
   const [copied, setCopied] = useState(false);

@@ -1,20 +1,33 @@
 import { z } from 'zod';
 
-export const CreateQuoteSchema = z.object({
-  amount: z.number().positive().max(1000000),
-  from: z.enum(['PHP']),
-  to: z.enum(['IDR']),
-  trackingCode: z.string().optional(),
-});
+export const CURRENCY_SYMBOLS = { PHP: '₱', IDR: 'Rp' } as const;
+export const CURRENCY_NAMES = { PHP: 'Philippine Peso', IDR: 'Indonesian Rupiah' } as const;
 
-export const CreateTransferSchema = z.object({
-  quoteId: z.string().optional(),
-  amount: z.number().positive(),
-  from: z.enum(['PHP']),
-  to: z.enum(['IDR']),
-  idempotencyKey: z.string().uuid().optional(),
-  trackingCode: z.string().optional(),
-});
+export const CreateQuoteSchema = z
+  .object({
+    amount: z.number().positive().max(1000000),
+    from: z.enum(['PHP', 'IDR']),
+    to: z.enum(['PHP', 'IDR']),
+    trackingCode: z.string().optional(),
+  })
+  .refine((data) => data.from !== data.to, {
+    message: 'Source and target currencies must differ',
+    path: ['to'],
+  });
+
+export const CreateTransferSchema = z
+  .object({
+    quoteId: z.string().optional(),
+    amount: z.number().positive(),
+    from: z.enum(['PHP', 'IDR']),
+    to: z.enum(['PHP', 'IDR']),
+    idempotencyKey: z.string().uuid().optional(),
+    trackingCode: z.string().optional(),
+  })
+  .refine((data) => data.from !== data.to, {
+    message: 'Source and target currencies must differ',
+    path: ['to'],
+  });
 
 export type CreateQuoteRequest = z.infer<typeof CreateQuoteSchema>;
 export type CreateTransferRequest = z.infer<typeof CreateTransferSchema>;
@@ -24,7 +37,7 @@ export interface QuoteResponse {
   fee: number;
   receiveAmount: number;
   timestamp: number;
-  discount?: { applied: boolean; percent: number; reason: string };
+  discount?: { applied: boolean; percent: number; reason: string; threshold?: number; balance?: number };
 }
 
 export interface TransferResponse {

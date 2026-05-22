@@ -6,22 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Aseanflow Brand Utilities
+ * ASEANFlow Brand Utilities
  */
-export const webgenixColors = {
-  purple: "#7C3AED",
-  deepPurple: "#5B21B6",
-  lightPurple: "#A78BFA",
-  white: "#FFFFFF",
-  darkGray: "#374151",
-  gradientStart: "#8B5CF6",
-  gradientEnd: "#7C3AED",
+export const aseanflowColors = {
+  primary: "#10B981",
+  dark: "#064E3B",
+  accent: "#34D399",
+  success: "#22C55E",
+  gradientStart: "#34D399",
+  gradientEnd: "#10B981",
 } as const;
 
 /**
- * Generate Aseanflow gradient background classes
+ * Generate ASEANFlow gradient background classes
  */
-export function webgenixGradient(
+export function aseanflowGradient(
   direction:
     | "to-r"
     | "to-l"
@@ -32,16 +31,16 @@ export function webgenixGradient(
     | "to-tr"
     | "to-tl" = "to-r",
 ) {
-  return `bg-gradient-${direction} from-webgenix-gradient-start to-webgenix-gradient-end`;
+  return `bg-gradient-${direction} from-aseanflow-gradient-start to-aseanflow-gradient-end`;
 }
 
 /**
- * Aseanflow brand button variants
+ * ASEANFlow brand button variants
  */
-export const webgenixButtonVariants = {
-  primary: "bg-aseanflow-#10B981 hover:bg-aseanflow-#10B981-deep text-white",
+export const aseanflowButtonVariants = {
+  primary: "bg-aseanflow-primary hover:bg-aseanflow-dark text-white",
   secondary:
-    "bg-webgenix-light-purple hover:bg-aseanflow-#10B981 text-webgenix-dark-gray hover:text-white",
+    "bg-aseanflow-accent hover:bg-aseanflow-primary text-white",
   gradient:
-    "bg-gradient-to-r from-webgenix-gradient-start to-webgenix-gradient-end hover:from-aseanflow-#10B981-deep hover:to-aseanflow-#10B981 text-white",
+    "bg-gradient-to-r from-aseanflow-gradient-start to-aseanflow-gradient-end hover:from-aseanflow-dark hover:to-aseanflow-primary text-white",
 } as const;

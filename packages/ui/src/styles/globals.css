@@ -8,104 +8,102 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Webgenix Brand Colors */
-  --webgenix-purple: #7C3AED;
-  --webgenix-deep-purple: #5B21B6;
-  --webgenix-light-purple: #A78BFA;
-  --webgenix-white: #FFFFFF;
-  --webgenix-dark-gray: #374151;
-  --webgenix-gradient-start: #8B5CF6;
-  --webgenix-gradient-end: #7C3AED;
+  /* ASEANFlow Brand Colors */
+  --aseanflow-primary: #10B981;
+  --aseanflow-dark: #064E3B;
+  --aseanflow-accent: #34D399;
+  --aseanflow-success: #22C55E;
+  --aseanflow-gradient-start: #34D399;
+  --aseanflow-gradient-end: #10B981;
 
   /* OKLCH converted brand colors with WCAG 2.1 AA compliant contrast ratios */
   --background: oklch(1 0 0); /* White */
-  --foreground: oklch(0.225 0.007 251.55); /* Darker gray for 4.5:1+ contrast */
+  --foreground: oklch(0.145 0.02 163); /* Dark with green hint */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.225 0.007 251.55); /* Darker gray for better contrast */
+  --card-foreground: oklch(0.145 0.02 163);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.225 0.007 251.55); /* Darker gray for better contrast */
-  --primary: oklch(0.47 0.16 290.16); /* Darker purple for better contrast on white */
-  --primary-foreground: oklch(1 0 0); /* White text on purple */
-  --secondary: oklch(0.63 0.108 290.16); /* Darker light purple for better contrast */
-  --secondary-foreground: oklch(0.225 0.007 251.55); /* Darker gray */
-  --muted: oklch(0.975 0.005 285.95); /* Very light purple tint */
-  --muted-foreground: oklch(0.45 0.007 251.55); /* Darker for 4.5:1+ contrast */
-  --accent: oklch(0.63 0.108 290.16); /* Darker light purple for better contrast */
-  --accent-foreground: oklch(0.225 0.007 251.55); /* Darker gray */
+  --popover-foreground: oklch(0.145 0.02 163);
+  --primary: oklch(0.596 0.145 163); /* Emerald-600 for AA contrast on white */
+  --primary-foreground: oklch(1 0 0); /* White text on emerald */
+  --secondary: oklch(0.955 0.02 163); /* Light emerald tint */
+  --secondary-foreground: oklch(0.269 0.072 163); /* Dark emerald */
+  --muted: oklch(0.965 0.01 163); /* Subtle emerald gray */
+  --muted-foreground: oklch(0.45 0.03 163); /* Medium emerald gray */
+  --accent: oklch(0.765 0.177 163); /* Emerald-400 (#34D399) */
+  --accent-foreground: oklch(0.145 0.02 163); /* Dark on accent */
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0.004 285.95);
-  --input: oklch(0.922 0.004 285.95);
-  --ring: oklch(0.547 0.16 290.16); /* Purple ring */
-  --chart-1: oklch(0.547 0.16 290.16); /* Purple */
-  --chart-2: oklch(0.725 0.108 290.16); /* Light purple */
-  --chart-3: oklch(0.398 0.135 290.16); /* Deep purple */
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --border: oklch(0.922 0.01 163);
+  --input: oklch(0.922 0.01 163);
+  --ring: oklch(0.596 0.145 163); /* Emerald ring */
+  --chart-1: oklch(0.696 0.17 163); /* Emerald-500 */
+  --chart-2: oklch(0.765 0.177 163); /* Emerald-400 */
+  --chart-3: oklch(0.508 0.118 163); /* Emerald-700 */
+  --chart-4: oklch(0.845 0.143 163); /* Emerald-300 */
+  --chart-5: oklch(0.269 0.072 163); /* Emerald-900 */
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0.002 285.95); /* Very light purple tint */
-  --sidebar-foreground: oklch(0.34 0.007 251.55);
-  --sidebar-primary: oklch(0.547 0.16 290.16); /* Purple */
+  --sidebar: oklch(0.98 0.005 163);
+  --sidebar-foreground: oklch(0.269 0.072 163);
+  --sidebar-primary: oklch(0.596 0.145 163); /* Emerald */
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.725 0.108 290.16); /* Light purple */
-  --sidebar-accent-foreground: oklch(0.34 0.007 251.55);
-  --sidebar-border: oklch(0.922 0.004 285.95);
-  --sidebar-ring: oklch(0.547 0.16 290.16);
+  --sidebar-accent: oklch(0.765 0.177 163); /* Emerald-400 */
+  --sidebar-accent-foreground: oklch(0.269 0.072 163);
+  --sidebar-border: oklch(0.922 0.01 163);
+  --sidebar-ring: oklch(0.596 0.145 163);
 }
 
 .dark {
-  --background: oklch(0.145 0.007 251.55); /* Dark gray with subtle purple tint */
+  --background: oklch(0.145 0.02 163); /* Dark with green tint */
   --foreground: oklch(0.985 0 0); /* White */
-  --card: oklch(0.205 0.007 251.55); /* Slightly lighter dark with purple tint */
+  --card: oklch(0.205 0.02 163); /* Slightly lighter dark with green tint */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0.007 251.55);
+  --popover: oklch(0.205 0.02 163);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.725 0.108 290.16); /* Light purple - more visible in dark mode */
-  --primary-foreground: oklch(0.145 0.007 251.55); /* Dark text on light purple */
-  --secondary: oklch(0.269 0.03 285.95); /* Dark purple tinted gray */
+  --primary: oklch(0.765 0.177 163); /* Emerald-400 — bright in dark mode */
+  --primary-foreground: oklch(0.145 0.02 163); /* Dark text on emerald */
+  --secondary: oklch(0.269 0.04 163); /* Dark green tinted gray */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0.03 285.95); /* Dark purple tinted */
-  --muted-foreground: oklch(0.85 0.02 285.95); /* Lighter for better contrast in dark mode */
-  --accent: oklch(0.398 0.135 290.16); /* Deep purple */
+  --muted: oklch(0.269 0.04 163); /* Dark green tinted */
+  --muted-foreground: oklch(0.7 0.03 163); /* Lighter for better contrast in dark mode */
+  --accent: oklch(0.508 0.118 163); /* Emerald-700 */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.269 0.03 285.95);
-  --input: oklch(0.269 0.03 285.95);
-  --ring: oklch(0.725 0.108 290.16); /* Light purple ring */
-  --chart-1: oklch(0.725 0.108 290.16); /* Light purple */
-  --chart-2: oklch(0.547 0.16 290.16); /* Purple */
-  --chart-3: oklch(0.398 0.135 290.16); /* Deep purple */
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0.007 251.55); /* Dark with purple tint */
+  --border: oklch(0.269 0.04 163);
+  --input: oklch(0.269 0.04 163);
+  --ring: oklch(0.765 0.177 163); /* Emerald-400 ring */
+  --chart-1: oklch(0.765 0.177 163); /* Emerald-400 */
+  --chart-2: oklch(0.696 0.17 163); /* Emerald-500 */
+  --chart-3: oklch(0.508 0.118 163); /* Emerald-700 */
+  --chart-4: oklch(0.845 0.143 163); /* Emerald-300 */
+  --chart-5: oklch(0.269 0.072 163); /* Emerald-900 */
+  --sidebar: oklch(0.205 0.02 163); /* Dark with green tint */
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.725 0.108 290.16); /* Light purple */
-  --sidebar-primary-foreground: oklch(0.145 0.007 251.55);
-  --sidebar-accent: oklch(0.398 0.135 290.16); /* Deep purple */
+  --sidebar-primary: oklch(0.765 0.177 163); /* Emerald-400 */
+  --sidebar-primary-foreground: oklch(0.145 0.02 163);
+  --sidebar-accent: oklch(0.508 0.118 163); /* Emerald-700 */
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0.03 285.95);
-  --sidebar-ring: oklch(0.725 0.108 290.16);
+  --sidebar-border: oklch(0.269 0.04 163);
+  --sidebar-ring: oklch(0.765 0.177 163);
 }
 
 @theme inline {
-  /* Webgenix Brand Color Utilities */
-  --color-webgenix-purple: var(--webgenix-purple);
-  --color-webgenix-deep-purple: var(--webgenix-deep-purple);
-  --color-webgenix-light-purple: var(--webgenix-light-purple);
-  --color-webgenix-white: var(--webgenix-white);
-  --color-webgenix-dark-gray: var(--webgenix-dark-gray);
-  --color-webgenix-gradient-start: var(--webgenix-gradient-start);
-  --color-webgenix-gradient-end: var(--webgenix-gradient-end);
-  
-  /* Webgenix Gradient Utilities - Brand compliant gradients with proper contrast */
-  --gradient-webgenix: linear-gradient(to right, var(--webgenix-gradient-start), var(--webgenix-gradient-end));
-  --gradient-webgenix-hover: linear-gradient(to right, var(--webgenix-deep-purple), var(--webgenix-purple));
-  --gradient-webgenix-focus: var(--webgenix-light-purple);
-  --gradient-webgenix-subtle: linear-gradient(to bottom right, color-mix(in oklch, var(--webgenix-light-purple), transparent 95%), color-mix(in oklch, var(--webgenix-purple), transparent 90%));
-  --gradient-webgenix-accent: linear-gradient(to bottom right, color-mix(in oklch, var(--webgenix-light-purple), transparent 80%), color-mix(in oklch, var(--webgenix-purple), transparent 80%));
+  /* ASEANFlow Brand Color Utilities */
+  --color-aseanflow-primary: var(--aseanflow-primary);
+  --color-aseanflow-dark: var(--aseanflow-dark);
+  --color-aseanflow-accent: var(--aseanflow-accent);
+  --color-aseanflow-success: var(--aseanflow-success);
+  --color-aseanflow-gradient-start: var(--aseanflow-gradient-start);
+  --color-aseanflow-gradient-end: var(--aseanflow-gradient-end);
 
-  /* Existing Design System Colors */
+  /* ASEANFlow Gradient Utilities */
+  --gradient-aseanflow: linear-gradient(to right, var(--aseanflow-gradient-start), var(--aseanflow-gradient-end));
+  --gradient-aseanflow-hover: linear-gradient(to right, var(--aseanflow-dark), var(--aseanflow-primary));
+  --gradient-aseanflow-focus: var(--aseanflow-accent);
+  --gradient-aseanflow-subtle: linear-gradient(to bottom right, color-mix(in oklch, var(--aseanflow-accent), transparent 95%), color-mix(in oklch, var(--aseanflow-primary), transparent 90%));
+  --gradient-aseanflow-accent: linear-gradient(to bottom right, color-mix(in oklch, var(--aseanflow-accent), transparent 80%), color-mix(in oklch, var(--aseanflow-primary), transparent 80%));
+
+  /* Design System Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -165,20 +163,20 @@
       transform: translateY(0);
     }
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
   }
-  
+
   /* Improved container utilities for consistent centering */
   .container-centered {
     @apply mx-auto max-w-7xl px-4 md:px-6;
   }
-  
+
   .container-narrow {
     @apply mx-auto max-w-4xl px-4 md:px-6;
   }
-  
+
   .container-wide {
     @apply mx-auto max-w-7xl px-4 md:px-6;
   }

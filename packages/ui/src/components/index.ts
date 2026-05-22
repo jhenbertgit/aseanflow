@@ -18,7 +18,7 @@ export { Toaster } from "./toaster";
 // Brand Utilities
 export {
   cn,
-  webgenixColors,
-  webgenixGradient,
-  webgenixButtonVariants,
+  aseanflowColors,
+  aseanflowGradient,
+  aseanflowButtonVariants,
 } from "../lib/utils";

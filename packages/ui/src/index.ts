@@ -6,15 +6,15 @@ export * from "./lib/accessibility";
 // Re-export common utilities for easy access
 export {
   cn,
-  webgenixColors,
-  webgenixGradient,
-  webgenixButtonVariants,
+  aseanflowColors,
+  aseanflowGradient,
+  aseanflowButtonVariants,
 } from "./lib/utils";
 export {
   getContrastRatio,
   meetsWCAGAA,
   meetsWCAGAAA,
-  webgenixAccessibilityReport,
+  aseanflowAccessibilityReport,
   logAccessibilityReport,
 } from "./lib/accessibility";
 

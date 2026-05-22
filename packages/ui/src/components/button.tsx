@@ -20,15 +20,15 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
-        // Aseanflow Brand Variants
-        "webgenix-primary":
-          "bg-aseanflow-#10B981 text-white shadow-xs hover:bg-aseanflow-#10B981-deep focus-visible:ring-webgenix-light-purple/50",
-        "webgenix-secondary":
-          "bg-webgenix-light-purple text-webgenix-dark-gray shadow-xs hover:bg-aseanflow-#10B981 hover:text-white focus-visible:ring-aseanflow-#10B981/50",
-        "webgenix-gradient":
-          "text-white shadow-xs focus-visible:ring-[color:var(--gradient-webgenix-focus)]/50 transition-all duration-200 [background-image:var(--gradient-webgenix)] hover:[background-image:var(--gradient-webgenix-hover)] hover:shadow-md active:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:[background-image:var(--gradient-webgenix)] focus-visible:ring-2 focus-visible:ring-offset-2",
-        "webgenix-outline":
-          "border border-aseanflow-#10B981 bg-background text-aseanflow-#10B981 shadow-xs hover:bg-aseanflow-#10B981 hover:text-white focus-visible:ring-webgenix-light-purple/50",
+        // ASEANFlow Brand Variants
+        "brand-primary":
+          "bg-aseanflow-primary text-white shadow-xs hover:bg-aseanflow-dark focus-visible:ring-aseanflow-accent/50",
+        "brand-secondary":
+          "bg-aseanflow-accent text-white shadow-xs hover:bg-aseanflow-primary focus-visible:ring-aseanflow-primary/50",
+        "brand-gradient":
+          "text-white shadow-xs focus-visible:ring-[color:var(--gradient-aseanflow-focus)]/50 transition-all duration-200 [background-image:var(--gradient-aseanflow)] hover:[background-image:var(--gradient-aseanflow-hover)] hover:shadow-md active:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:[background-image:var(--gradient-aseanflow)] focus-visible:ring-2 focus-visible:ring-offset-2",
+        "brand-outline":
+          "border border-aseanflow-primary bg-background text-aseanflow-primary shadow-xs hover:bg-aseanflow-primary hover:text-white focus-visible:ring-aseanflow-accent/50",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -14,7 +14,7 @@ import { CreateTransferDto } from './dto/create-transfer.dto';
 import { Prisma } from '@aseanflow/database';
 import { TransferEvents } from '../../events/transfer.events';
 
-const STATUS_ORDER: TransferStatus[] = [
+const STATUS_ORDER_PHP_TO_IDR: TransferStatus[] = [
   'CREATED',
   'QUOTE_LOCKED',
   'INSTA_PAY_PROCESSING',
@@ -23,6 +23,22 @@ const STATUS_ORDER: TransferStatus[] = [
   'SETTLED',
   'MORPH_ANCHORED',
 ];
+
+const STATUS_ORDER_IDR_TO_PHP: TransferStatus[] = [
+  'CREATED',
+  'QUOTE_LOCKED',
+  'BI_FAST_PROCESSING',
+  'FX_CONVERSION',
+  'INSTA_PAY_PROCESSING',
+  'SETTLED',
+  'MORPH_ANCHORED',
+];
+
+function getStatusOrder(sourceCurrency: string): TransferStatus[] {
+  return sourceCurrency === 'IDR'
+    ? STATUS_ORDER_IDR_TO_PHP
+    : STATUS_ORDER_PHP_TO_IDR;
+}
 
 @Injectable()
 export class TransferService {
@@ -68,8 +84,8 @@ export class TransferService {
     const transfer = await this.prisma.transfer.create({
       data: {
         trackingCode,
-        sourceCurrency: 'PHP',
-        targetCurrency: 'IDR',
+        sourceCurrency: dto.from as 'PHP' | 'IDR',
+        targetCurrency: dto.to as 'PHP' | 'IDR',
         sendAmount: new Prisma.Decimal(dto.amount),
         receiveAmount: new Prisma.Decimal(quote.receiveAmount),
         exchangeRate: new Prisma.Decimal(quote.rate),
@@ -102,8 +118,9 @@ export class TransferService {
       throw new NotFoundException('Transfer not found');
     }
 
-    const currentIndex = STATUS_ORDER.indexOf(transfer.status);
-    const newIndex = STATUS_ORDER.indexOf(newStatus);
+    const statusOrder = getStatusOrder(transfer.sourceCurrency);
+    const currentIndex = statusOrder.indexOf(transfer.status);
+    const newIndex = statusOrder.indexOf(newStatus);
 
     if (newIndex !== currentIndex + 1) {
       throw new BadRequestException(

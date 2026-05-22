@@ -9,6 +9,7 @@ import {
   Shield,
   Zap,
   Link2,
+  Coins,
 } from "lucide-react";
 
 interface NodeProps {
@@ -91,7 +92,7 @@ export function ArchitectureDiagram() {
             label="NestJS"
             sublabel="API :3001"
             icon={<Server className="h-5 w-5" />}
-            color="border-green-300 bg-green-50 dark:bg-green-950/20"
+            color="border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20"
             delay={0.6}
           />
           <FlowArrow delay={0.8} />
@@ -140,6 +141,60 @@ export function ArchitectureDiagram() {
         </div>
       </div>
 
+      {/* Reward flow */}
+      <div className="space-y-3">
+        <h3 className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
+          Reward Flow (AFT Token)
+        </h3>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Node
+            label="Transfer"
+            sublabel="SETTLED state"
+            icon={<Shield className="h-5 w-5" />}
+            color="border-teal-300 bg-teal-50 dark:bg-teal-950/20"
+            delay={2.05}
+          />
+          <FlowArrow delay={2.15} />
+          <Node
+            label="BullMQ Worker"
+            sublabel="reward-mint job"
+            icon={<Zap className="h-5 w-5" />}
+            color="border-amber-300 bg-amber-50 dark:bg-amber-950/20"
+            delay={2.25}
+          />
+          <FlowArrow delay={2.35} />
+          <Node
+            label="Mint AFT"
+            sublabel="ERC-20 on Morph L2"
+            icon={<Coins className="h-5 w-5" />}
+            color="border-yellow-300 bg-yellow-50 dark:bg-yellow-950/20"
+            delay={2.45}
+          />
+          <FlowArrow delay={2.55} />
+          <Node
+            label="Wallet"
+            sublabel="Balance updated"
+            icon={<Database className="h-5 w-5" />}
+            color="border-indigo-300 bg-indigo-50 dark:bg-indigo-950/20"
+            delay={2.65}
+          />
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.75, duration: 0.4 }}
+          className="rounded-lg border-2 border-dashed border-yellow-400 bg-yellow-50 p-4 text-center dark:bg-yellow-950/20"
+        >
+          <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
+            10 AFT per Transfer
+          </p>
+          <p className="mt-1 text-xs text-yellow-600 dark:text-yellow-500">
+            Every settled transfer earns 10 AFT reward tokens. Hold AFT for fee
+            discounts on future transfers. On-chain mint via Morph L2.
+          </p>
+        </motion.div>
+      </div>
+
       {/* Data stores */}
       <div className="space-y-3">
         <h3 className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
@@ -151,14 +206,14 @@ export function ArchitectureDiagram() {
             sublabel="Transfers + Ledger"
             icon={<Database className="h-5 w-5" />}
             color="border-sky-300 bg-sky-50 dark:bg-sky-950/20"
-            delay={2.2}
+            delay={2.9}
           />
           <Node
             label="Redis"
             sublabel="Cache + Queue"
             icon={<Database className="h-5 w-5" />}
             color="border-red-300 bg-red-50 dark:bg-red-950/20"
-            delay={2.4}
+            delay={3.1}
           />
         </div>
       </div>
@@ -167,13 +222,13 @@ export function ArchitectureDiagram() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.6, duration: 0.4 }}
-        className="rounded-lg border-2 border-dashed border-green-400 bg-green-50 p-4 text-center dark:bg-green-950/20"
+        transition={{ delay: 3.3, duration: 0.4 }}
+        className="rounded-lg border-2 border-dashed border-emerald-400 bg-emerald-50 p-4 text-center dark:bg-emerald-950/20"
       >
-        <p className="text-sm font-medium text-green-700 dark:text-green-400">
+        <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
           SWIFT-Free Path
         </p>
-        <p className="mt-1 text-xs text-green-600 dark:text-green-500">
+        <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-500">
           No USD intermediary. PHP → InstaPay → FX → BI-FAST → IDR. Settlement
           in seconds, not days.
         </p>
@@ -190,7 +245,7 @@ export function ArchitectureDiagram() {
               key={tech.name}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.8 + i * 0.08, duration: 0.3 }}
+              transition={{ delay: 3.5 + i * 0.08, duration: 0.3 }}
               className="rounded-lg border bg-card p-2.5 text-center"
             >
               <p className="text-sm font-medium">{tech.name}</p>

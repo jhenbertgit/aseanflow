@@ -109,16 +109,16 @@ export const layout = {
 } as const;
 
 export const gradients = {
-  /** Aseanflow brand gradient utilities */
-  webgenix: {
+  /** ASEANFlow brand gradient utilities */
+  aseanflow: {
     /** Primary brand gradient */
-    primary: "[background-image:var(--gradient-webgenix)]" as const,
+    primary: "[background-image:var(--gradient-aseanflow)]" as const,
     /** Hover state gradient */
-    hover: "[background-image:var(--gradient-webgenix-hover)]" as const,
+    hover: "[background-image:var(--gradient-aseanflow-hover)]" as const,
     /** Subtle background gradient */
-    subtle: "[background-image:var(--gradient-webgenix-subtle)]" as const,
+    subtle: "[background-image:var(--gradient-aseanflow-subtle)]" as const,
     /** Accent component gradient */
-    accent: "[background-image:var(--gradient-webgenix-accent)]" as const,
+    accent: "[background-image:var(--gradient-aseanflow-accent)]" as const,
   },
 } as const;
 
@@ -126,13 +126,13 @@ export const accessibility = {
   /** WCAG 2.1 AA compliant color utilities */
   contrast: {
     /** High contrast text on light backgrounds */
-    highOnLight: "text-[oklch(0.225_0.007_251.55)]" as const,
+    highOnLight: "text-[oklch(0.145_0.02_163)]" as const,
     /** High contrast text on dark backgrounds */
     highOnDark: "text-[oklch(0.985_0_0)]" as const,
     /** Medium contrast text for secondary content */
-    mediumOnLight: "text-[oklch(0.45_0.007_251.55)]" as const,
+    mediumOnLight: "text-[oklch(0.45_0.03_163)]" as const,
     /** Medium contrast text for secondary content in dark mode */
-    mediumOnDark: "text-[oklch(0.85_0.02_285.95)]" as const,
+    mediumOnDark: "text-[oklch(0.7_0.03_163)]" as const,
   },
   /** Focus and interaction states */
   focus: {
@@ -154,6 +154,6 @@ export type TypographyBody = keyof typeof typography.body;
 export type LayoutContainer = keyof typeof layout.container;
 export type LayoutGrid = keyof typeof layout.grid;
 export type LayoutFlex = keyof typeof layout.flex;
-export type GradientAseanflow = keyof typeof gradients.webgenix;
+export type GradientAseanflow = keyof typeof gradients.aseanflow;
 export type AccessibilityContrast = keyof typeof accessibility.contrast;
 export type AccessibilityFocus = keyof typeof accessibility.focus;

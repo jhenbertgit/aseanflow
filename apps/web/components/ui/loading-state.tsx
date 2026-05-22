@@ -18,7 +18,7 @@ export function LoadingState({
   return (
     <div className="flex flex-col items-center justify-center p-8 space-y-4">
       <Loader2
-        className={`${sizeClasses[size]} animate-spin text-aseanflow-#10B981`}
+        className={`${sizeClasses[size]} animate-spin text-primary`}
       />
       {message && <p className="text-sm text-muted-foreground">{message}</p>}
     </div>

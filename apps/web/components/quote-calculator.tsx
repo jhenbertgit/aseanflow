@@ -13,18 +13,31 @@ import {
 } from "@aseanflow/ui/components/card";
 import { Input } from "@aseanflow/ui/components/input";
 
+import { LoadingState } from "@/components/ui/loading-state";
 import { RewardBadge } from "@/components/reward-badge";
 import { useCreateTransfer, useQuote, useWallet } from "@/lib/api/hooks";
+import { CURRENCY_SYMBOLS } from "@/lib/constants";
 
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 1_000_000;
 const ETA_SECONDS = "~10 seconds";
 
+type Direction = "PHP_TO_IDR" | "IDR_TO_PHP";
+
 export function QuoteCalculator() {
   const [amount, setAmount] = useState<number>(1000);
   const [trackingCode, setTrackingCode] = useState("");
+  const [direction, setDirection] = useState<Direction>("PHP_TO_IDR");
+
+  const from = direction === "PHP_TO_IDR" ? "PHP" : "IDR";
+  const to = direction === "PHP_TO_IDR" ? "IDR" : "PHP";
+  const sourceSymbol = CURRENCY_SYMBOLS[from];
+  const targetSymbol = CURRENCY_SYMBOLS[to];
+
   const { data: quote, isLoading, error: quoteError } = useQuote(
     amount,
+    from,
+    to,
     trackingCode || undefined,
   );
   const { data: wallet } = useWallet(trackingCode);
@@ -49,10 +62,16 @@ export function QuoteCalculator() {
     setTrackingCode(e.target.value.trim());
   }
 
+  function handleSwap() {
+    setDirection((d) => (d === "PHP_TO_IDR" ? "IDR_TO_PHP" : "PHP_TO_IDR"));
+  }
+
   function handleContinue() {
     if (!isAmountValid || isSubmitting) return;
     createTransfer.mutate({
       amount,
+      from,
+      to,
       trackingCode: trackingCode || undefined,
     });
   }
@@ -62,17 +81,28 @@ export function QuoteCalculator() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-xl">Send PHP → IDR</CardTitle>
+        <CardTitle className="text-xl flex items-center gap-2">
+          Send {from} → {to}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={handleSwap}
+            title="Swap direction"
+          >
+            ⇅
+          </Button>
+        </CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="amount" className="text-sm font-medium">
-            You send (PHP)
+            You send ({from})
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              ₱
+              {sourceSymbol}
             </span>
             <Input
               id="amount"
@@ -81,14 +111,14 @@ export function QuoteCalculator() {
               max={MAX_AMOUNT}
               value={amount || ""}
               onChange={handleAmountChange}
-              className="pl-7 text-lg"
+              className="text-lg pl-10"
               placeholder="Enter amount"
             />
           </div>
           {displayError && (
             <p className="text-sm text-destructive">
-              Amount must be between ₱{MIN_AMOUNT} and ₱
-              {MAX_AMOUNT.toLocaleString()}
+              Amount must be between {sourceSymbol}{MIN_AMOUNT} and{" "}
+              {sourceSymbol}{MAX_AMOUNT.toLocaleString()}
             </p>
           )}
         </div>
@@ -114,9 +144,8 @@ export function QuoteCalculator() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center text-muted-foreground py-4"
             >
-              Getting live rate...
+              <LoadingState size="sm" message="Getting live rate..." />
             </motion.div>
           )}
 
@@ -142,26 +171,37 @@ export function QuoteCalculator() {
             >
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Exchange Rate</span>
-                <span>1 PHP = {quote.rate.toLocaleString()} IDR</span>
+                <span>1 {from} = {quote.rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {to}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Fee</span>
-                <span>₱{quote.fee}</span>
+                <span>{sourceSymbol} {quote.fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">ETA</span>
                 <span>{ETA_SECONDS}</span>
               </div>
               {quote.discount?.applied && (
-                <div className="text-sm text-green-600">
+                <div className="text-sm text-primary">
                   AFT Discount: -{quote.discount.percent}% fee (
                   {quote.discount.reason})
                 </div>
               )}
+              {quote.discount &&
+                !quote.discount.applied &&
+                quote.discount.threshold && (
+                  <div className="text-sm text-muted-foreground">
+                    {quote.discount.reason}{" "}
+                    <span className="text-yellow-600">
+                      ({quote.discount.balance?.toFixed(2) ?? "0"}/
+                      {quote.discount.threshold} AFT)
+                    </span>
+                  </div>
+                )}
               <hr className="border-border" />
               <div className="flex justify-between font-semibold">
                 <span>They receive</span>
-                <span>Rp {quote.receiveAmount.toLocaleString()}</span>
+                <span>{targetSymbol} {quote.receiveAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </motion.div>
           )}

@@ -1,9 +1,9 @@
 /**
- * Aseanflow Brand Color Accessibility Utilities
+ * ASEANFlow Brand Color Accessibility Utilities
  * Ensures WCAG 2.1 AA compliance for brand colors
  */
 
-import { webgenixColors } from "./utils";
+import { aseanflowColors } from "./utils";
 
 /**
  * Convert hex color to RGB
@@ -72,54 +72,47 @@ export function meetsWCAGAAA(
   return isLargeText ? ratio >= 4.5 : ratio >= 7.0;
 }
 
+const white = "#FFFFFF";
+
 /**
- * Aseanflow brand color accessibility report
+ * ASEANFlow brand color accessibility report
  */
-export const webgenixAccessibilityReport = {
-  // Primary purple on white
-  purpleOnWhite: {
-    combination: `${webgenixColors.purple} on ${webgenixColors.white}`,
-    ratio: getContrastRatio(webgenixColors.purple, webgenixColors.white),
-    meetsAA: meetsWCAGAA(webgenixColors.purple, webgenixColors.white),
-    meetsAAA: meetsWCAGAAA(webgenixColors.purple, webgenixColors.white),
+export const aseanflowAccessibilityReport = {
+  primaryOnWhite: {
+    combination: `${aseanflowColors.primary} on ${white}`,
+    ratio: getContrastRatio(aseanflowColors.primary, white),
+    meetsAA: meetsWCAGAA(aseanflowColors.primary, white),
+    meetsAAA: meetsWCAGAAA(aseanflowColors.primary, white),
   },
-  // White text on purple
-  whiteOnPurple: {
-    combination: `${webgenixColors.white} on ${webgenixColors.purple}`,
-    ratio: getContrastRatio(webgenixColors.white, webgenixColors.purple),
-    meetsAA: meetsWCAGAA(webgenixColors.white, webgenixColors.purple),
-    meetsAAA: meetsWCAGAAA(webgenixColors.white, webgenixColors.purple),
+  whiteOnPrimary: {
+    combination: `${white} on ${aseanflowColors.primary}`,
+    ratio: getContrastRatio(white, aseanflowColors.primary),
+    meetsAA: meetsWCAGAA(white, aseanflowColors.primary),
+    meetsAAA: meetsWCAGAAA(white, aseanflowColors.primary),
   },
-  // Deep purple on white
-  deepPurpleOnWhite: {
-    combination: `${webgenixColors.deepPurple} on ${webgenixColors.white}`,
-    ratio: getContrastRatio(webgenixColors.deepPurple, webgenixColors.white),
-    meetsAA: meetsWCAGAA(webgenixColors.deepPurple, webgenixColors.white),
-    meetsAAA: meetsWCAGAAA(webgenixColors.deepPurple, webgenixColors.white),
+  darkOnWhite: {
+    combination: `${aseanflowColors.dark} on ${white}`,
+    ratio: getContrastRatio(aseanflowColors.dark, white),
+    meetsAA: meetsWCAGAA(aseanflowColors.dark, white),
+    meetsAAA: meetsWCAGAAA(aseanflowColors.dark, white),
   },
-  // White on deep purple
-  whiteOnDeepPurple: {
-    combination: `${webgenixColors.white} on ${webgenixColors.deepPurple}`,
-    ratio: getContrastRatio(webgenixColors.white, webgenixColors.deepPurple),
-    meetsAA: meetsWCAGAA(webgenixColors.white, webgenixColors.deepPurple),
-    meetsAAA: meetsWCAGAAA(webgenixColors.white, webgenixColors.deepPurple),
+  whiteOnDark: {
+    combination: `${white} on ${aseanflowColors.dark}`,
+    ratio: getContrastRatio(white, aseanflowColors.dark),
+    meetsAA: meetsWCAGAA(white, aseanflowColors.dark),
+    meetsAAA: meetsWCAGAAA(white, aseanflowColors.dark),
   },
-  // Dark gray on white
-  darkGrayOnWhite: {
-    combination: `${webgenixColors.darkGray} on ${webgenixColors.white}`,
-    ratio: getContrastRatio(webgenixColors.darkGray, webgenixColors.white),
-    meetsAA: meetsWCAGAA(webgenixColors.darkGray, webgenixColors.white),
-    meetsAAA: meetsWCAGAAA(webgenixColors.darkGray, webgenixColors.white),
+  accentOnWhite: {
+    combination: `${aseanflowColors.accent} on ${white}`,
+    ratio: getContrastRatio(aseanflowColors.accent, white),
+    meetsAA: meetsWCAGAA(aseanflowColors.accent, white),
+    meetsAAA: meetsWCAGAAA(aseanflowColors.accent, white),
   },
-  // Dark gray on light purple
-  darkGrayOnLightPurple: {
-    combination: `${webgenixColors.darkGray} on ${webgenixColors.lightPurple}`,
-    ratio: getContrastRatio(
-      webgenixColors.darkGray,
-      webgenixColors.lightPurple,
-    ),
-    meetsAA: meetsWCAGAA(webgenixColors.darkGray, webgenixColors.lightPurple),
-    meetsAAA: meetsWCAGAAA(webgenixColors.darkGray, webgenixColors.lightPurple),
+  successOnWhite: {
+    combination: `${aseanflowColors.success} on ${white}`,
+    ratio: getContrastRatio(aseanflowColors.success, white),
+    meetsAA: meetsWCAGAA(aseanflowColors.success, white),
+    meetsAAA: meetsWCAGAAA(aseanflowColors.success, white),
   },
 };
 
@@ -127,14 +120,14 @@ export const webgenixAccessibilityReport = {
  * Log accessibility report to console
  */
 export function logAccessibilityReport(): void {
-  console.group("🎨 Aseanflow Brand Colors - Accessibility Report");
+  console.group("ASEANFlow Brand Colors - Accessibility Report");
 
-  Object.values(webgenixAccessibilityReport).forEach((data) => {
+  Object.values(aseanflowAccessibilityReport).forEach((data) => {
     const status = data.meetsAAA
-      ? "🟢 AAA"
+      ? "AAA"
       : data.meetsAA
-        ? "🟡 AA"
-        : "🔴 Failed";
+        ? "AA"
+        : "Failed";
     console.log(
       `${status} ${data.combination} - Ratio: ${data.ratio.toFixed(2)}`,
     );

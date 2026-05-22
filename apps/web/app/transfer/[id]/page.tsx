@@ -13,10 +13,12 @@ import {
   CardTitle,
 } from "@aseanflow/ui/components/card";
 
+import { LoadingState } from "@/components/ui/loading-state";
 import { MorphProof } from "@/components/morph-proof";
 import { TransferTimeline } from "@/components/transfer-timeline";
 import { WalletInfo } from "@/components/wallet-info";
-import { useTransferStatus } from "@/lib/api/hooks";
+import { useTransferStatus, useWallet } from "@/lib/api/hooks";
+import { CURRENCY_SYMBOLS } from "@/lib/constants";
 
 export default function TransferPage({
   params,
@@ -25,6 +27,7 @@ export default function TransferPage({
 }) {
   const { id: trackingCode } = use(params);
   const { data: transfer, isLoading, error } = useTransferStatus(trackingCode);
+  const { data: wallet } = useWallet(trackingCode);
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-6 p-8">
@@ -71,9 +74,8 @@ export default function TransferPage({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="py-8 text-center text-muted-foreground"
                 >
-                  Loading transfer...
+                  <LoadingState message="Loading transfer..." />
                 </motion.div>
               )}
 
@@ -106,38 +108,32 @@ export default function TransferPage({
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">You send</span>
                       <span>
-                        ₱
-                        {new Intl.NumberFormat("en-PH").format(
-                          transfer.sendAmount,
-                        )}{" "}
-                        {transfer.sourceCurrency}
+                        {CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}
+                        {Number(transfer.sendAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">They receive</span>
                       <span>
-                        Rp{" "}
-                        {new Intl.NumberFormat("id-ID").format(
-                          transfer.receiveAmount,
-                        )}{" "}
-                        {transfer.targetCurrency}
+                        {CURRENCY_SYMBOLS[transfer.targetCurrency as keyof typeof CURRENCY_SYMBOLS]}
+                        {Number(transfer.receiveAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Rate</span>
                       <span>
                         1 {transfer.sourceCurrency} ={" "}
-                        {transfer.exchangeRate.toLocaleString()}{" "}
+                        {Number(transfer.exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}{" "}
                         {transfer.targetCurrency}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Fee</span>
-                      <span>₱{transfer.fee}</span>
+                      <span>{CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}{Number(transfer.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   </div>
 
-                  <TransferTimeline currentStatus={transfer.status} />
+                  <TransferTimeline currentStatus={transfer.status} sourceCurrency={transfer.sourceCurrency} />
 
                   {transfer.morphTxHash && (
                     <MorphProof txHash={transfer.morphTxHash} />
@@ -146,11 +142,17 @@ export default function TransferPage({
                   {(transfer.status === "SETTLED" ||
                     transfer.status === "MORPH_ANCHORED") &&
                     transfer.walletAddress && (
-                      <WalletInfo
-                        address={transfer.walletAddress}
-                        balance={transfer.rewardAmount ? transfer.rewardAmount : "0"}
-                        symbol="AFT"
-                      />
+                      <div className="space-y-2">
+                        <WalletInfo
+                          address={transfer.walletAddress}
+                          balance={wallet?.balance ?? "0"}
+                        />
+                        <Button asChild variant="link" size="sm" className="px-0">
+                          <Link href={`/rewards/${trackingCode}`}>
+                            View all rewards →
+                          </Link>
+                        </Button>
+                      </div>
                     )}
                 </motion.div>
               )}

@@ -2,6 +2,7 @@ import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { RedisClientType } from '@aseanflow/redis';
 import { WalletService } from '../wallet/wallet.service';
+import { Prisma } from '@aseanflow/database';
 
 interface LiveResponse {
   success: boolean;
@@ -95,10 +96,30 @@ export class FxService {
     to: string,
     trackingCode?: string,
   ) {
-    const rate = await this.getRate(from, to);
+    // Always fetch canonical PHP→IDR rate, invert for IDR→PHP
+    const canonicalRate = await this.getRate('PHP', 'IDR');
 
-    let fee = 10;
-    let discount = { applied: false, percent: 0, reason: '' };
+    let rate: number;
+    if (from === 'IDR' && to === 'PHP') {
+      rate = new Prisma.Decimal(1).div(canonicalRate).toNumber();
+    } else {
+      rate = canonicalRate;
+    }
+
+    // Base fee is 10 PHP — convert to source currency for IDR→PHP
+    let fee: number;
+    if (from === 'IDR') {
+      fee = new Prisma.Decimal(10).mul(canonicalRate).toNumber();
+    } else {
+      fee = 10;
+    }
+    let discount: {
+      applied: boolean;
+      percent: number;
+      reason: string;
+      threshold?: number;
+      balance?: number;
+    } = { applied: false, percent: 0, reason: '' };
 
     if (trackingCode) {
       const wallet = await this.walletService.findByTrackingCode(trackingCode);
@@ -107,15 +128,25 @@ export class FxService {
         const threshold = parseFloat(
           this.configService.get('REWARD_FEE_DISCOUNT_THRESHOLD', '100'),
         );
-        if (parseFloat(balance) >= threshold) {
-          const discountPercent = parseFloat(
-            this.configService.get('REWARD_FEE_DISCOUNT_PERCENT', '50'),
-          );
+        const discountPercent = parseFloat(
+          this.configService.get('REWARD_FEE_DISCOUNT_PERCENT', '50'),
+        );
+        const bal = parseFloat(balance);
+
+        if (bal >= threshold) {
           fee = fee * (1 - discountPercent / 100);
           discount = {
             applied: true,
             percent: discountPercent,
             reason: 'AFT holder discount',
+          };
+        } else {
+          discount = {
+            applied: false,
+            percent: discountPercent,
+            reason: `Hold ${threshold} AFT for ${discountPercent}% fee discount`,
+            threshold,
+            balance: bal,
           };
         }
       }

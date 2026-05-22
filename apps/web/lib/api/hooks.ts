@@ -18,17 +18,22 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced;
 }
 
-export function useQuote(amount: number, trackingCode?: string) {
+export function useQuote(
+  amount: number,
+  from: string = "PHP",
+  to: string = "IDR",
+  trackingCode?: string,
+) {
   const debouncedAmount = useDebounce(amount, 300);
   const debouncedTrackingCode = useDebounce(trackingCode ?? "", 300);
 
   return useQuery({
-    queryKey: ["quote", debouncedAmount, debouncedTrackingCode],
+    queryKey: ["quote", debouncedAmount, from, to, debouncedTrackingCode],
     queryFn: () =>
       getQuote(
         debouncedAmount,
-        "PHP",
-        "IDR",
+        from,
+        to,
         debouncedTrackingCode || undefined,
       ),
     enabled: debouncedAmount > 0 && debouncedAmount <= 1_000_000,
@@ -42,11 +47,15 @@ export function useCreateTransfer() {
   return useMutation({
     mutationFn: ({
       amount,
+      from,
+      to,
       trackingCode,
     }: {
       amount: number;
+      from: string;
+      to: string;
       trackingCode?: string;
-    }) => createTransfer(amount, "PHP", "IDR", trackingCode),
+    }) => createTransfer(amount, from, to, trackingCode),
     onSuccess: (data) => {
       router.push(`/transfer/${data.trackingCode}`);
     },

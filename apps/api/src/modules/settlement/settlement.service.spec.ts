@@ -57,7 +57,7 @@ describe('SettlementService', () => {
   let transferService: { advanceStatus: jest.Mock };
   let instapay: { simulate: jest.Mock };
   let bifast: { simulate: jest.Mock };
-  let prisma: { transfer: { update: jest.Mock } };
+  let prisma: { transfer: { update: jest.Mock; findUnique: jest.Mock } };
   let eventEmitter: { emit: jest.Mock };
   let morphQueue: { add: jest.Mock };
 
@@ -77,7 +77,15 @@ describe('SettlementService', () => {
         timestamp: Date.now(),
       }),
     };
-    prisma = { transfer: { update: jest.fn().mockResolvedValue({}) } };
+    prisma = {
+      transfer: {
+        update: jest.fn().mockResolvedValue({}),
+        findUnique: jest.fn().mockResolvedValue({
+          trackingCode: 'TXNTEST',
+          sourceCurrency: 'PHP',
+        }),
+      },
+    };
     eventEmitter = { emit: jest.fn() };
     morphQueue = { add: jest.fn().mockResolvedValue({}) };
 
@@ -136,9 +144,12 @@ describe('SettlementService', () => {
   it('emits transfer.settled event', async () => {
     await service.orchestrate('t1');
 
-    expect(eventEmitter.emit).toHaveBeenCalledWith('transfer.settled', {
-      transferId: 't1',
-    });
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      'transfer.settled',
+      expect.objectContaining({
+        transferId: 't1',
+      }),
+    );
   });
 
   it('queues morph-anchor job after SETTLED', async () => {
@@ -154,5 +165,25 @@ describe('SettlementService', () => {
 
     expect(instapay.simulate).toHaveBeenCalled();
     expect(bifast.simulate).toHaveBeenCalled();
+  });
+
+  it('swaps simulator order for IDR→PHP', async () => {
+    prisma.transfer.findUnique.mockResolvedValue({
+      trackingCode: 'TXNIDR',
+      sourceCurrency: 'IDR',
+    });
+
+    await service.orchestrate('t2');
+
+    const calls = transferService.advanceStatus.mock.calls.map(
+      (c: string[]) => c[1],
+    );
+    expect(calls).toEqual([
+      'QUOTE_LOCKED',
+      'BI_FAST_PROCESSING',
+      'FX_CONVERSION',
+      'INSTA_PAY_PROCESSING',
+      'SETTLED',
+    ]);
   });
 });

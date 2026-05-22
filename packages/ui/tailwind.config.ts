@@ -15,14 +15,13 @@ const config: Config = {
       // Note: With Tailwind v4, color definitions are primarily handled in CSS
       // The colors below provide fallbacks for IDE intellisense
       colors: {
-        // Aseanflow Brand Colors (defined in globals.css)
-        "aseanflow-#10B981": "#7C3AED",
-        "aseanflow-#10B981-deep": "#5B21B6",
-        "webgenix-light-purple": "#A78BFA",
-        "webgenix-white": "#FFFFFF",
-        "webgenix-dark-gray": "#374151",
-        "webgenix-gradient-start": "#8B5CF6",
-        "webgenix-gradient-end": "#7C3AED",
+        // ASEANFlow Brand Colors (defined in globals.css)
+        "aseanflow-primary": "#10B981",
+        "aseanflow-dark": "#064E3B",
+        "aseanflow-accent": "#34D399",
+        "aseanflow-success": "#22C55E",
+        "aseanflow-gradient-start": "#34D399",
+        "aseanflow-gradient-end": "#10B981",
 
         // Design system colors (CSS variables defined in globals.css)
         background: "oklch(var(--background))",
