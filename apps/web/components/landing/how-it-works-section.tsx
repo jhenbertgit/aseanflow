@@ -35,7 +35,7 @@ export function HowItWorksSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12 text-center text-2xl font-bold tracking-tight text-[#f1f5f9] sm:text-3xl"
+          className="mb-12 text-center text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
           How It Works
         </motion.h2>
@@ -51,15 +51,15 @@ export function HowItWorksSection() {
               transition={{ delay: i * 0.15 }}
               className="flex flex-col items-center text-center md:flex-1"
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#10b981] bg-[#0a0f1a] text-sm font-bold text-[#10b981]">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--accent-emerald)] bg-[var(--bg-deep)] text-sm font-bold text-[var(--accent-emerald)]">
                 {step.num}
               </div>
-              <h3 className="mb-1 text-base font-semibold text-[#f1f5f9]">
+              <h3 className="mb-1 text-base font-semibold text-[var(--text-primary)]">
                 {step.title}
               </h3>
-              <p className="text-sm text-[#94a3b8]">{step.desc}</p>
+              <p className="text-sm text-[var(--text-muted)]">{step.desc}</p>
               {step.badge && (
-                <span className="mt-2 rounded-full bg-[rgba(251,191,36,0.15)] px-3 py-0.5 text-xs font-medium text-[#fbbf24]">
+                <span className="mt-2 rounded-full bg-[rgba(251,191,36,0.15)] px-3 py-0.5 text-xs font-medium text-[var(--accent-gold)]">
                   {step.badge}
                 </span>
               )}

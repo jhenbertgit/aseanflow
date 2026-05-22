@@ -40,7 +40,7 @@ export function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12 text-center text-2xl font-bold tracking-tight text-[#f1f5f9] sm:text-3xl"
+          className="mb-12 text-center text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
           Why ASEANFlow
         </motion.h2>
@@ -57,15 +57,15 @@ export function FeaturesSection() {
               className="glass-card p-6"
               style={
                 f.gold
-                  ? { borderLeftColor: "#fbbf24", borderLeftWidth: "3px" }
+                  ? { borderLeftColor: "var(--accent-gold)", borderLeftWidth: "3px" }
                   : undefined
               }
             >
               <div className="mb-3 text-2xl">{f.icon}</div>
-              <h3 className="mb-1 text-base font-semibold text-[#f1f5f9]">
+              <h3 className="mb-1 text-base font-semibold text-[var(--text-primary)]">
                 {f.title}
               </h3>
-              <p className="text-sm leading-relaxed text-[#94a3b8]">
+              <p className="text-sm leading-relaxed text-[var(--text-muted)]">
                 {f.desc}
               </p>
             </motion.div>

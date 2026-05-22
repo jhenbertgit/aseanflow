@@ -10,7 +10,7 @@ const stats = [
 
 export function StatsSection() {
   return (
-    <section className="relative border-y border-[rgba(255,255,255,0.06)] bg-[rgba(15,22,41,0.5)] px-4 py-14">
+    <section className="relative border-y border-[var(--border-glass)] bg-[var(--bg-surface)]/50 px-4 py-14">
       <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-3">
         {stats.map((s, i) => (
           <motion.div
@@ -21,10 +21,10 @@ export function StatsSection() {
             transition={{ duration: 0.4, delay: i * 0.1 }}
             className="text-center"
           >
-            <div className="text-3xl font-bold text-[#10b981] sm:text-4xl">
+            <div className="text-3xl font-bold text-[var(--accent-emerald)] sm:text-4xl">
               {s.value}
             </div>
-            <div className="mt-1 text-sm text-[#94a3b8]">{s.label}</div>
+            <div className="mt-1 text-sm text-[var(--text-muted)]">{s.label}</div>
           </motion.div>
         ))}
       </div>

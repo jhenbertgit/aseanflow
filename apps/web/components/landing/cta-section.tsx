@@ -15,17 +15,17 @@ export function CtaSection() {
         transition={{ duration: 0.5 }}
         className="mx-auto flex max-w-md flex-col items-center gap-6 text-center"
       >
-        <h2 className="text-2xl font-bold tracking-tight text-[#f1f5f9] sm:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
           Start Sending Money Today
         </h2>
         <Button
           asChild
           size="lg"
-          className="bg-[#10b981] px-8 text-white hover:bg-[#059669]"
+          className="bg-[var(--accent-emerald)] px-8 text-white hover:bg-[var(--accent-emerald-dark)]"
         >
           <Link href="/send">Send Money</Link>
         </Button>
-        <p className="text-sm text-[#fbbf24]">
+        <p className="text-sm text-[var(--accent-gold)]">
           Earn AFT on every transfer ⭐
         </p>
       </motion.div>

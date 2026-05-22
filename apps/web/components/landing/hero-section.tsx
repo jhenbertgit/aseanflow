@@ -40,7 +40,7 @@ export function HeroSection() {
       >
         <motion.p
           variants={fadeUp}
-          className="text-[11px] font-medium uppercase tracking-[0.25em] text-[#94a3b8]"
+          className="text-[11px] font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]"
         >
           Cross-Border Payments
         </motion.p>
@@ -48,27 +48,27 @@ export function HeroSection() {
         <motion.h1
           variants={fadeUp}
           className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
-          style={{ color: "#f1f5f9" }}
+          style={{ color: "var(--text-primary)" }}
         >
-          ASEAN<span style={{ color: "#10b981" }}>Flow</span>
+          ASEAN<span style={{ color: "var(--accent-emerald)" }}>Flow</span>
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          className="max-w-md text-sm text-[#94a3b8] sm:text-base"
+          className="max-w-md text-sm text-[var(--text-muted)] sm:text-base"
         >
           SWIFT-Free PHP ↔ IDR Payments
         </motion.p>
 
         <motion.div variants={fadeUp} className="flex gap-3">
-          <Button asChild size="lg" className="bg-[#10b981] text-white hover:bg-[#059669]">
+          <Button asChild size="lg" className="bg-[var(--accent-emerald)] text-white hover:bg-[var(--accent-emerald-dark)]">
             <Link href="/send">Send Money</Link>
           </Button>
           <Button
             asChild
             variant="outline"
             size="lg"
-            className="border-[rgba(255,255,255,0.1)] bg-transparent text-[#94a3b8] hover:bg-[rgba(255,255,255,0.05)] hover:text-[#f1f5f9]"
+            className="border-[var(--border-glass)] bg-transparent text-[var(--text-muted)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--text-primary)]"
           >
             <Link href="/architecture">Architecture</Link>
           </Button>
@@ -83,12 +83,12 @@ export function HeroSection() {
             value={trackingCode}
             onChange={(e) => setTrackingCode(e.target.value)}
             placeholder="Tracking code"
-            className="flex-1 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-[#f1f5f9] placeholder:text-[#64748b]"
+            className="flex-1 border-[var(--border-glass)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[#64748b]"
           />
           <Button
             type="submit"
             size="sm"
-            className="bg-[#fbbf24] text-[#0a0f1a] hover:bg-[#fcd34d]"
+            className="bg-[var(--accent-gold)] text-[var(--bg-deep)] hover:bg-[var(--accent-gold-light)]"
           >
             Rewards
           </Button>
@@ -96,7 +96,7 @@ export function HeroSection() {
 
         <motion.p
           variants={fadeUp}
-          className="text-xs text-[#fbbf24]"
+          className="text-xs text-[var(--accent-gold)]"
         >
           Earn AFT reward tokens on every transfer ⭐
         </motion.p>
