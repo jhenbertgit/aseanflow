@@ -24,7 +24,7 @@ RUN cd packages/redis && pnpm build
 RUN cd packages/database && pnpm build
 RUN cd apps/api && pnpm build
 
-RUN pnpm deploy --prod --filter @aseanflow/api /app/deploy
+RUN pnpm deploy --prod --legacy --filter @aseanflow/api /app/deploy
 
 FROM node:20-alpine
 WORKDIR /app

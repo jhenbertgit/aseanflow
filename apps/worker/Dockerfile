@@ -20,7 +20,7 @@ RUN pnpm --filter @aseanflow/shared build
 RUN pnpm --filter @aseanflow/database build
 RUN pnpm --filter @aseanflow/worker build
 
-RUN pnpm deploy --prod --filter @aseanflow/worker /app/deploy
+RUN pnpm deploy --prod --legacy --filter @aseanflow/worker /app/deploy
 
 FROM node:20-alpine
 WORKDIR /app
