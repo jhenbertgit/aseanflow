@@ -7,11 +7,19 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@aseanflow.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt_data:/letsencrypt
     networks:
       - aseanflow
 
@@ -66,7 +74,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-aseanflow}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      FRONTEND_URL: ${FRONTEND_URL:-https://localhost}
       APILAYER_API_KEY: ${APILAYER_API_KEY:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       MORPH_RPC_URL: ${MORPH_RPC_URL:-https://rpc-hoodi.morph.network}
@@ -79,7 +87,9 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.api.rule: "Host(`${API_HOST:-api.localhost}`)"
-      traefik.http.routers.api.entrypoints: web
+      traefik.http.routers.api.entrypoints: websecure
+      traefik.http.routers.api.tls: "true"
+      traefik.http.routers.api.tls.certresolver: letsencrypt
       traefik.http.services.api.loadbalancer.server.port: "3001"
     depends_on:
       postgres:
@@ -120,11 +130,13 @@ services:
     container_name: aseanflow-web
     restart: unless-stopped
     environment:
-      API_BASE_URL: ${API_BASE_URL:-http://api.localhost}
+      API_BASE_URL: ${API_BASE_URL:-https://api.localhost}
     labels:
       traefik.enable: "true"
       traefik.http.routers.web.rule: "Host(`${WEB_HOST:-localhost}`)"
-      traefik.http.routers.web.entrypoints: web
+      traefik.http.routers.web.entrypoints: websecure
+      traefik.http.routers.web.tls: "true"
+      traefik.http.routers.web.tls.certresolver: letsencrypt
       traefik.http.services.web.loadbalancer.server.port: "3000"
     depends_on:
       api:
@@ -136,6 +148,8 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  letsencrypt_data:
     driver: local
 
 networks:
