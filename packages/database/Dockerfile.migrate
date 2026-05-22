@@ -9,4 +9,4 @@ RUN pnpm install --frozen-lockfile
 COPY packages/database/prisma ./packages/database/prisma
 COPY packages/database/prisma.config.ts ./packages/database/prisma.config.ts
 
-CMD ["sh", "-c", "ls -la node_modules/.bin/prisma && ./node_modules/.bin/prisma migrate deploy --schema packages/database/prisma/schema.prisma"]
+CMD ["sh", "-c", "echo '=== root .bin ===' && ls node_modules/.bin/ 2>/dev/null | head -20 && echo '=== db .bin ===' && ls packages/database/node_modules/.bin/ 2>/dev/null | head -20 && echo '=== find prisma ===' && find . -name prisma -type l -o -name prisma -type f 2>/dev/null | head -10"]
