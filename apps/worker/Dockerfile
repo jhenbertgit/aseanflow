@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 RUN corepack enable
 WORKDIR /app
 
@@ -16,10 +16,15 @@ COPY packages ./packages
 COPY turbo.json ./
 
 RUN pnpm --filter @aseanflow/database generate
+RUN pnpm --filter @aseanflow/shared build
+RUN pnpm --filter @aseanflow/database build
 RUN pnpm --filter @aseanflow/worker build
 
-ENV CI=true
-RUN pnpm prune --prod
+RUN pnpm deploy --prod --filter @aseanflow/worker /app/deploy
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/deploy .
 
 ENV NODE_ENV=production
-CMD ["node", "apps/worker/dist/src/main.js"]
+CMD ["node", "dist/src/main.js"]

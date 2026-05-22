@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 RUN corepack enable
 WORKDIR /app
 
@@ -24,9 +24,12 @@ RUN cd packages/redis && pnpm build
 RUN cd packages/database && pnpm build
 RUN cd apps/api && pnpm build
 
-ENV CI=true
-RUN pnpm prune --prod
+RUN pnpm deploy --prod --filter @aseanflow/api /app/deploy
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/deploy .
 
 ENV NODE_ENV=production
 EXPOSE 3001
-CMD ["node", "apps/api/dist/src/main.js"]
+CMD ["node", "dist/src/main.js"]
