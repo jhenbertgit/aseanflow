@@ -18,6 +18,7 @@ COPY turbo.json ./
 RUN pnpm --filter @aseanflow/database generate
 RUN pnpm --filter @aseanflow/worker build
 
+ENV CI=true
 RUN pnpm prune --prod
 
 ENV NODE_ENV=production

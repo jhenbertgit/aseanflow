@@ -24,6 +24,7 @@ RUN cd packages/redis && pnpm build
 RUN cd packages/database && pnpm build
 RUN cd apps/api && pnpm build
 
+ENV CI=true
 RUN pnpm prune --prod
 
 ENV NODE_ENV=production
