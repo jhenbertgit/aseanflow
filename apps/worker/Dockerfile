@@ -23,6 +23,10 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 RUN pnpm --filter @aseanflow/database generate
 RUN pnpm --filter @aseanflow/worker build
 
+# Create production deployment with flat node_modules (no symlinks)
+WORKDIR /app/apps/worker
+RUN pnpm deploy --prod /app/deploy
+
 FROM base AS runner
 ENV NODE_ENV=production
 WORKDIR /app
@@ -31,9 +35,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 worker
 
 COPY --from=builder /app/apps/worker/dist ./dist
-COPY --from=builder /app/apps/worker/node_modules ./node_modules
-COPY --from=builder /app/packages/database/generated ./packages/database/generated
-COPY --from=builder /app/node_modules ./node_modules_root
+COPY --from=builder /app/deploy/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
 USER worker

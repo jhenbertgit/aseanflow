@@ -33,6 +33,9 @@ RUN cd packages/database && pnpm build
 WORKDIR /app/apps/api
 RUN pnpm build
 
+# Create production deployment with flat node_modules (no symlinks)
+RUN pnpm deploy --prod /app/deploy
+
 FROM base AS runner
 ENV NODE_ENV=production
 WORKDIR /app
@@ -41,9 +44,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 api
 
 COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules ./node_modules
-COPY --from=builder /app/packages/database/generated ./packages/database/generated
-COPY --from=builder /app/node_modules ./node_modules_root
+COPY --from=builder /app/deploy/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
 USER api
