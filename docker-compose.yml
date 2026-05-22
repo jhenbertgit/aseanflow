@@ -1,4 +1,20 @@
 services:
+  traefik:
+    image: traefik:v3.7
+    container_name: aseanflow-traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - aseanflow
+
   postgres:
     image: postgres:16-alpine
     container_name: aseanflow-postgres
@@ -44,15 +60,18 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: aseanflow-api
     restart: unless-stopped
-    ports:
-      - "${API_PORT:-3001}:3001"
     environment:
       NODE_ENV: production
       PORT: 3001
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-aseanflow}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.api.rule: "Host(`${API_HOST:-api.localhost}`)"
+      traefik.http.routers.api.entrypoints: web
+      traefik.http.services.api.loadbalancer.server.port: "3001"
     depends_on:
       postgres:
         condition: service_healthy
@@ -89,10 +108,13 @@ services:
       dockerfile: apps/web/Dockerfile
     container_name: aseanflow-web
     restart: unless-stopped
-    ports:
-      - "${WEB_PORT:-3000}:3000"
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      API_BASE_URL: ${API_BASE_URL:-http://api.localhost}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.web.rule: "Host(`${WEB_HOST:-localhost}`)"
+      traefik.http.routers.web.entrypoints: web
+      traefik.http.services.web.loadbalancer.server.port: "3000"
     depends_on:
       api:
         condition: service_started

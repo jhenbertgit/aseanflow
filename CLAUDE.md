@@ -49,5 +49,5 @@ pnpm test                           # test all
 ```bash
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/aseanflow_dev
 REDIS_URL=redis://localhost:6380
-NEXT_PUBLIC_API_URL=http://localhost:3001
+API_BASE_URL=http://localhost:3001
 ```

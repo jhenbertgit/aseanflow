@@ -16,7 +16,7 @@ PRP chunks:
 - `PRPs/prp_10_demo_docker_polish.md` — `/demo` architecture diagram, Docker Compose production
 
 Key patterns:
-- **API Client**: `lib/api/` — fetch wrapper, backend at `NEXT_PUBLIC_API_URL` (default `http://localhost:3001`)
+- **API Client**: `lib/api/` — fetch wrapper, backend at `API_BASE_URL` (default `http://localhost:3001`)
 - **Components**: `components/` — app-specific only. Shared UI from `@aseanflow/ui`
 - **Types**: `@aseanflow/shared` — Zod schemas, shared types
 - **State**: React Query for server state (quotes, transfer status). No Zustand.
@@ -73,7 +73,7 @@ pnpm lint                   # lint all
 ### Environment
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
+API_BASE_URL=http://localhost:3001
 ```
 
 ---
