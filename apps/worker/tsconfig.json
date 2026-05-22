@@ -10,6 +10,7 @@
       "@aseanflow/database": ["../../packages/database/src"],
       "@aseanflow/shared": ["../../packages/shared/src"]
     },
+    "noEmit": false,
     "skipLibCheck": true
   },
   "include": ["src/**/*"],

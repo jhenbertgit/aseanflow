@@ -29,6 +29,7 @@ RUN pnpm --filter @aseanflow/database build
 RUN pnpm --filter @aseanflow/worker build
 
 RUN pnpm deploy --prod --legacy --filter @aseanflow/worker /app/deploy
+RUN cp -r /app/apps/worker/dist /app/deploy/dist
 
 FROM node:20-alpine
 WORKDIR /app
