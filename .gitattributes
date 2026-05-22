@@ -108,3 +108,7 @@ Thumbs.db binary
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
+
+# Agent plans and superpowers
+*.superpower/*
+

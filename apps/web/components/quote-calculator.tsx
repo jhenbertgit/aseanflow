@@ -21,6 +21,7 @@ import { CURRENCY_SYMBOLS } from "@/lib/constants";
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 1_000_000;
 const ETA_SECONDS = "~10 seconds";
+const TRACKING_CODE_RE = /^TXN[A-Z0-9]{3,12}$/;
 
 type Direction = "PHP_TO_IDR" | "IDR_TO_PHP";
 
@@ -34,17 +35,23 @@ export function QuoteCalculator() {
   const sourceSymbol = CURRENCY_SYMBOLS[from];
   const targetSymbol = CURRENCY_SYMBOLS[to];
 
+  const trackingCodeValid = !!trackingCode && TRACKING_CODE_RE.test(trackingCode);
   const { data: quote, isLoading, error: quoteError } = useQuote(
     amount,
     from,
     to,
-    trackingCode || undefined,
+    trackingCodeValid ? trackingCode : undefined,
   );
-  const { data: wallet } = useWallet(trackingCode);
+  const { data: wallet, isLoading: walletLoading } = useWallet(
+    trackingCodeValid ? trackingCode : "",
+  );
+  const walletNotFound =
+    trackingCodeValid && !walletLoading && wallet === null;
   const createTransfer = useCreateTransfer();
 
   const isAmountValid = amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
   const isSubmitting = createTransfer.isPending;
+  const trackingCodeInvalid = !!trackingCode && !trackingCodeValid;
 
   function handleAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
@@ -135,6 +142,16 @@ export function QuoteCalculator() {
             placeholder="Enter tracking code for returning users"
           />
           {wallet && <RewardBadge balance={wallet.balance} />}
+          {trackingCodeInvalid && (
+            <p className="text-xs text-destructive">
+              Invalid format. Expected: TXN + uppercase letters/numbers (e.g. TXNABC123XYZ).
+            </p>
+          )}
+          {!trackingCodeInvalid && walletNotFound && (
+            <p className="text-xs text-destructive">
+              No wallet found for this tracking code.
+            </p>
+          )}
         </div>
 
         <AnimatePresence mode="wait">

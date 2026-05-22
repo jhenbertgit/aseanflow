@@ -71,6 +71,8 @@ export function useTransferStatus(trackingCode: string) {
       return 1000;
     },
     enabled: !!trackingCode,
+    retry: false,
+    placeholderData: (prev) => prev,
   });
 }
 

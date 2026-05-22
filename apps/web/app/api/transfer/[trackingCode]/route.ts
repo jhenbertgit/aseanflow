@@ -9,8 +9,14 @@ export async function GET(
 ) {
   const { trackingCode } = await params;
 
-  const res = await fetch(`${API_BASE}/api/transfer/${trackingCode}`);
-
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+  try {
+    const res = await fetch(`${API_BASE}/api/transfer/${trackingCode}`);
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
+  } catch {
+    return NextResponse.json(
+      { message: "Backend unavailable" },
+      { status: 503 },
+    );
+  }
 }

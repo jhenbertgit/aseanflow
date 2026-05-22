@@ -6,12 +6,19 @@ const API_BASE =
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const res = await fetch(`${API_BASE}/api/transfer`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  try {
+    const res = await fetch(`${API_BASE}/api/transfer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
+  } catch {
+    return NextResponse.json(
+      { message: "Backend unavailable" },
+      { status: 503 },
+    );
+  }
 }

@@ -20,14 +20,26 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+const TRACKING_CODE_RE = /^TXN[A-Z0-9]{9}$/;
+
 export function HeroSection() {
   const [trackingCode, setTrackingCode] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
   function handleViewRewards(e: React.FormEvent) {
     e.preventDefault();
-    const code = trackingCode.trim();
-    if (code) router.push(`/rewards/${code}`);
+    const code = trackingCode.trim().toUpperCase();
+    if (!code) {
+      setError("Enter a tracking code");
+      return;
+    }
+    if (!TRACKING_CODE_RE.test(code)) {
+      setError("Invalid format — expected TXN + 9 characters");
+      return;
+    }
+    setError("");
+    router.push(`/rewards/${code}`);
   }
 
   return (
@@ -79,19 +91,29 @@ export function HeroSection() {
           variants={fadeUp}
           className="flex w-full max-w-xs items-center gap-2"
         >
-          <Input
-            value={trackingCode}
-            onChange={(e) => setTrackingCode(e.target.value)}
-            placeholder="Tracking code"
-            className="flex-1 border-[var(--border-glass)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[#64748b]"
-          />
-          <Button
-            type="submit"
-            size="sm"
-            className="bg-[var(--accent-gold)] text-[var(--bg-deep)] hover:bg-[var(--accent-gold-light)]"
-          >
-            Rewards
-          </Button>
+          <div className="flex w-full flex-col gap-1">
+            <div className="flex w-full items-center gap-2">
+              <Input
+                value={trackingCode}
+                onChange={(e) => {
+                  setTrackingCode(e.target.value);
+                  setError("");
+                }}
+                placeholder="Tracking code (TXN...)"
+                className="flex-1 border-[var(--border-glass)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[#64748b]"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="bg-[var(--accent-gold)] text-[var(--bg-deep)] hover:bg-[var(--accent-gold-light)]"
+              >
+                Rewards
+              </Button>
+            </div>
+            {error && (
+              <p className="px-1 text-xs text-destructive">{error}</p>
+            )}
+          </div>
         </motion.form>
 
         <motion.p

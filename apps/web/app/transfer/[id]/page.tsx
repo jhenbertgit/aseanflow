@@ -26,8 +26,10 @@ export default function TransferPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: trackingCode } = use(params);
-  const { data: transfer, isLoading, error } = useTransferStatus(trackingCode);
+  const { data: transfer, isLoading, error, isFetching } = useTransferStatus(trackingCode);
   const { data: wallet } = useWallet(trackingCode);
+  const showLoading = isLoading && !transfer;
+  const showError = !!error && !transfer;
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-6 p-8">
@@ -68,7 +70,7 @@ export default function TransferPage({
 
           <CardContent className="space-y-6">
             <AnimatePresence mode="wait">
-              {isLoading && (
+              {showLoading && (
                 <motion.div
                   key="loading"
                   initial={{ opacity: 0 }}
@@ -79,7 +81,7 @@ export default function TransferPage({
                 </motion.div>
               )}
 
-              {error && (
+              {showError && (
                 <motion.div
                   key="error"
                   initial={{ opacity: 0 }}
