@@ -4,8 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@aseanflow/ui/components/button";
-import { Send, Layout, Sun, Moon, Menu, X } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Send, Layout, Menu, X } from "lucide-react";
 
 const navItems = [
   { name: "Send", href: "/send", icon: Send },
@@ -14,7 +13,6 @@ const navItems = [
 
 export function Navigation() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
@@ -46,16 +44,6 @@ export function Navigation() {
                 </Link>
               );
             })}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-9 w-9 p-0"
-              aria-label="Toggle theme"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </Button>
           </div>
 
           <Button
