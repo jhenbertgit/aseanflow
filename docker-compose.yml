@@ -4,7 +4,6 @@ services:
     container_name: aseanflow-traefik
     restart: unless-stopped
     command:
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -16,7 +15,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      # 8080 removed — traefik dashboard must not be public
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt_data:/letsencrypt
