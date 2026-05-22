@@ -1,0 +1,17 @@
+node_modules
+.next
+.turbo
+dist
+coverage
+.git
+.github
+docs
+*.md
+!packages/*/README.md
+.env*.local
+.idea
+.vscode
+.claude
+.superpowers
+docker-compose*.yml
+Dockerfile*
