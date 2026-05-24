@@ -13,6 +13,7 @@ import { TransferStatus } from '@aseanflow/database';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { Prisma } from '@aseanflow/database';
 import { TransferEvents } from '../../events/transfer.events';
+import { randomBytes } from 'crypto';
 
 const STATUS_ORDER_PHP_TO_IDR: TransferStatus[] = [
   'CREATED',
@@ -110,32 +111,34 @@ export class TransferService {
   }
 
   async advanceStatus(transferId: string, newStatus: TransferStatus) {
-    const transfer = await this.prisma.transfer.findUnique({
-      where: { id: transferId },
-    });
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const transfer = await tx.transfer.findUnique({
+        where: { id: transferId },
+      });
 
-    if (!transfer) {
-      throw new NotFoundException('Transfer not found');
-    }
+      if (!transfer) {
+        throw new NotFoundException('Transfer not found');
+      }
 
-    const statusOrder = getStatusOrder(transfer.sourceCurrency);
-    const currentIndex = statusOrder.indexOf(transfer.status);
-    const newIndex = statusOrder.indexOf(newStatus);
+      const statusOrder = getStatusOrder(transfer.sourceCurrency);
+      const currentIndex = statusOrder.indexOf(transfer.status);
+      const newIndex = statusOrder.indexOf(newStatus);
 
-    if (newIndex !== currentIndex + 1) {
-      throw new BadRequestException(
-        `Invalid transition: ${transfer.status} → ${newStatus}`,
-      );
-    }
+      if (newIndex !== currentIndex + 1) {
+        throw new BadRequestException(
+          `Invalid transition: ${transfer.status} → ${newStatus}`,
+        );
+      }
 
-    const updated = await this.prisma.transfer.update({
-      where: { id: transferId },
-      data: { status: newStatus },
+      return tx.transfer.update({
+        where: { id: transferId },
+        data: { status: newStatus },
+      });
     });
 
     this.eventEmitter.emit(TransferEvents.STATUS_CHANGED, {
       transferId,
-      oldStatus: transfer.status,
+      oldStatus: updated.status,
       newStatus,
       timestamp: Date.now(),
     });
@@ -158,9 +161,10 @@ export class TransferService {
 
   private generateTrackingCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const bytes = randomBytes(9);
     let code = 'TXN';
     for (let i = 0; i < 9; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
+      code += chars[bytes[i] % chars.length];
     }
     return code;
   }

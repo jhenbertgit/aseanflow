@@ -25,18 +25,6 @@ import { BifastSimulator } from './bifast.simulator';
       },
       inject: [ConfigService],
     },
-    {
-      provide: 'REWARD_QUEUE',
-      useFactory: (configService: ConfigService) => {
-        return new Queue('reward-mint', {
-          connection: {
-            host: configService.get<string>('REDIS_HOST', 'localhost'),
-            port: configService.get<number>('REDIS_PORT', 6380),
-          },
-        });
-      },
-      inject: [ConfigService],
-    },
   ],
   exports: [SettlementService],
 })

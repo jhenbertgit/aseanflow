@@ -5,6 +5,7 @@ import { TransferService } from './transfer.service';
 import { FxService } from '../fx/fx.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
+import { TrackingCodePipe } from '../../common/pipes/tracking-code.pipe';
 
 @ApiTags('Transfer')
 @Controller('api')
@@ -44,7 +45,9 @@ export class TransferController {
   @ApiOperation({ summary: 'Track a transfer by code' })
   @ApiResponse({ status: 200, description: 'Transfer found' })
   @ApiResponse({ status: 404, description: 'Transfer not found' })
-  async getTransfer(@Param('trackingCode') trackingCode: string) {
+  async getTransfer(
+    @Param('trackingCode', TrackingCodePipe) trackingCode: string,
+  ) {
     return this.transferService.getByTrackingCode(trackingCode);
   }
 }

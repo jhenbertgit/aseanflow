@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Queue } from 'bullmq';
 import { TransferService } from '../transfer/transfer.service';
@@ -24,7 +24,12 @@ export class SettlementService {
     const transfer = await this.prisma.transfer.findUnique({
       where: { id: transferId },
     });
-    const isIdrToPhp = transfer?.sourceCurrency === 'IDR';
+
+    if (!transfer) {
+      throw new NotFoundException('Transfer not found');
+    }
+
+    const isIdrToPhp = transfer.sourceCurrency === 'IDR';
 
     if (isIdrToPhp) {
       const bifastResult = await this.bifast.simulate();
@@ -80,7 +85,7 @@ export class SettlementService {
 
     this.eventEmitter.emit(TransferEvents.SETTLED, {
       transferId,
-      trackingCode: settledTransfer?.trackingCode ?? '',
+      trackingCode: settledTransfer?.trackingCode ?? transferId,
       timestamp: Date.now(),
     });
 
