@@ -99,19 +99,19 @@ export class FxService {
     // Always fetch canonical PHP→IDR rate, invert for IDR→PHP
     const canonicalRate = await this.getRate('PHP', 'IDR');
 
-    let rate: number;
+    let rate: Prisma.Decimal;
     if (from === 'IDR' && to === 'PHP') {
-      rate = new Prisma.Decimal(1).div(canonicalRate).toNumber();
+      rate = new Prisma.Decimal(1).div(canonicalRate);
     } else {
-      rate = canonicalRate;
+      rate = new Prisma.Decimal(canonicalRate);
     }
 
     // Base fee is 10 PHP — convert to source currency for IDR→PHP
-    let fee: number;
+    let fee: Prisma.Decimal;
     if (from === 'IDR') {
-      fee = new Prisma.Decimal(10).mul(canonicalRate).toNumber();
+      fee = new Prisma.Decimal(10).mul(canonicalRate);
     } else {
-      fee = 10;
+      fee = new Prisma.Decimal(10);
     }
     let discount: {
       applied: boolean;
@@ -134,7 +134,7 @@ export class FxService {
         const bal = parseFloat(balance);
 
         if (bal >= threshold) {
-          fee = fee * (1 - discountPercent / 100);
+          fee = fee.mul(new Prisma.Decimal(1).minus(discountPercent / 100));
           discount = {
             applied: true,
             percent: discountPercent,
@@ -152,7 +152,13 @@ export class FxService {
       }
     }
 
-    const receiveAmount = (amount - fee) * rate;
-    return { rate, fee, receiveAmount, timestamp: Date.now(), discount };
+    const receiveAmount = new Prisma.Decimal(amount).minus(fee).mul(rate);
+    return {
+      rate: rate.toNumber(),
+      fee: fee.toNumber(),
+      receiveAmount: receiveAmount.toNumber(),
+      timestamp: Date.now(),
+      discount,
+    };
   }
 }
