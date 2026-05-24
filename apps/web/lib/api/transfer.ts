@@ -3,16 +3,25 @@ import type {
   TransferResponse,
 } from "@aseanflow/shared";
 
+export interface CreateTransferPayload {
+  amount: number;
+  from: string;
+  to: string;
+  trackingCode?: string;
+  recipientType: "WALLET" | "BANK";
+  recipientWalletId?: string;
+  recipientName?: string;
+  recipientBank?: string;
+  recipientAccount?: string;
+}
+
 export async function createTransfer(
-  amount: number,
-  from: string = "PHP",
-  to: string = "IDR",
-  trackingCode?: string,
+  payload: CreateTransferPayload,
 ): Promise<TransferResponse> {
   const res = await fetch("/api/transfer", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, from, to, trackingCode }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {

@@ -3,7 +3,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createTransfer, getTransferByTrackingCode } from "./transfer";
+import {
+  createTransfer,
+  getTransferByTrackingCode,
+  type CreateTransferPayload,
+} from "./transfer";
 import { getQuote } from "./quote";
 import { getWalletInfo, getWalletHistory } from "./wallet";
 
@@ -45,17 +49,7 @@ export function useCreateTransfer() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: ({
-      amount,
-      from,
-      to,
-      trackingCode,
-    }: {
-      amount: number;
-      from: string;
-      to: string;
-      trackingCode?: string;
-    }) => createTransfer(amount, from, to, trackingCode),
+    mutationFn: (payload: CreateTransferPayload) => createTransfer(payload),
     onSuccess: (data) => {
       router.push(`/transfer/${data.trackingCode}`);
     },
