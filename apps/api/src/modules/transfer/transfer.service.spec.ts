@@ -95,6 +95,8 @@ describe('TransferService', () => {
         amount: 1000,
         from: 'PHP',
         to: 'IDR',
+        recipientType: 'WALLET',
+        recipientWalletId: 'wallet-1',
       });
 
       expect(result.trackingCode).toMatch(/^TXN/);
@@ -124,6 +126,8 @@ describe('TransferService', () => {
         amount: 500_000,
         from: 'IDR',
         to: 'PHP',
+        recipientType: 'WALLET',
+        recipientWalletId: 'wallet-1',
       });
 
       expect(result.trackingCode).toMatch(/^TXN/);
@@ -152,6 +156,7 @@ describe('TransferService', () => {
         from: 'PHP',
         to: 'IDR',
         idempotencyKey: 'test-uuid',
+        recipientType: 'WALLET' as const,
       };
       const result = await service.createTransfer(dto);
 
@@ -169,6 +174,8 @@ describe('TransferService', () => {
         from: 'PHP',
         to: 'IDR',
         idempotencyKey: 'test-uuid',
+        recipientType: 'WALLET',
+        recipientWalletId: 'wallet-1',
       });
 
       expect(redis.setEx).toHaveBeenCalledWith(
