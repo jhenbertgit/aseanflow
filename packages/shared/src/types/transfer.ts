@@ -23,11 +23,34 @@ export const CreateTransferSchema = z
     to: z.enum(['PHP', 'IDR']),
     idempotencyKey: z.string().uuid().optional(),
     trackingCode: z.string().optional(),
+    recipientType: z.enum(['WALLET', 'BANK']),
+    recipientWalletId: z.string().optional(),
+    recipientName: z.string().optional(),
+    recipientBank: z.string().optional(),
+    recipientAccount: z.string().optional(),
   })
   .refine((data) => data.from !== data.to, {
     message: 'Source and target currencies must differ',
     path: ['to'],
-  });
+  })
+  .refine(
+    (data) =>
+      data.recipientType === 'WALLET' ? !!data.recipientWalletId : true,
+    {
+      message: 'Wallet ID is required for wallet transfers',
+      path: ['recipientWalletId'],
+    },
+  )
+  .refine(
+    (data) =>
+      data.recipientType === 'BANK'
+        ? !!data.recipientName && !!data.recipientBank && !!data.recipientAccount
+        : true,
+    {
+      message: 'Recipient name, bank, and account are required for bank transfers',
+      path: ['recipientName'],
+    },
+  );
 
 export type CreateQuoteRequest = z.infer<typeof CreateQuoteSchema>;
 export type CreateTransferRequest = z.infer<typeof CreateTransferSchema>;
@@ -54,6 +77,11 @@ export interface TransferDetailResponse {
   fee: number;
   sourceCurrency: string;
   targetCurrency: string;
+  recipientType: 'WALLET' | 'BANK';
+  recipientWalletId: string | null;
+  recipientName: string | null;
+  recipientBank: string | null;
+  recipientAccount: string | null;
   morphTxHash: string | null;
   walletAddress: string | null;
   rewardTxHash: string | null;
