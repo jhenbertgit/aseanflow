@@ -22,6 +22,11 @@ enum TransferStatus {
   MORPH_ANCHORED
 }
 
+enum RecipientType {
+  WALLET
+  BANK
+}
+
 model Transfer {
   id             String         @id @default(cuid())
   trackingCode   String         @unique
@@ -39,6 +44,12 @@ model Transfer {
   morphTxHash    String?
   instapayRef    String?
   bifastRef      String?
+
+  recipientType     RecipientType @default(WALLET)
+  recipientName     String?
+  recipientBank     String?
+  recipientAccount  String?
+  recipientWalletId String?
 
   walletId       String?
   rewardTxHash   String?
