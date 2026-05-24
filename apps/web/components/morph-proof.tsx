@@ -14,7 +14,7 @@ export function MorphProof({ txHash }: { txHash: string }) {
       transition={{ type: "spring", stiffness: 200, damping: 15 }}
       className="rounded-lg border-2 border-primary bg-primary/10 p-4"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-lg">⛓️</span>
         <Badge className="bg-primary text-primary-foreground">Verified on Morph</Badge>
       </div>

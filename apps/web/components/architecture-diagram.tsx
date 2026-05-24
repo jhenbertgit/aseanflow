@@ -26,12 +26,12 @@ function Node({ label, sublabel, icon, color, delay = 0 }: NodeProps) {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, duration: 0.4, type: "spring", stiffness: 150 }}
-      className={`flex flex-col items-center gap-1.5 rounded-xl border-2 ${color} px-4 py-3 shadow-sm`}
+      className={`flex flex-col items-center gap-1.5 rounded-xl border-2 ${color} px-3 py-2 sm:px-4 sm:py-3 shadow-sm`}
     >
       {icon}
-      <span className="text-sm font-semibold">{label}</span>
+      <span className="text-xs sm:text-sm font-semibold">{label}</span>
       {sublabel && (
-        <span className="text-xs text-muted-foreground">{sublabel}</span>
+        <span className="text-[10px] sm:text-xs text-muted-foreground">{sublabel}</span>
       )}
     </motion.div>
   );
@@ -43,7 +43,7 @@ function FlowArrow({ delay = 0 }: { delay?: number }) {
       initial={{ opacity: 0, scaleX: 0 }}
       animate={{ opacity: 1, scaleX: 1 }}
       transition={{ delay, duration: 0.3 }}
-      className="flex items-center"
+      className="flex items-center rotate-90 sm:rotate-0"
     >
       <ArrowRight className="h-5 w-5 text-muted-foreground" />
     </motion.div>
@@ -71,7 +71,7 @@ export function ArchitectureDiagram() {
         </h3>
 
         {/* Row 1: User → Frontend → API → Payment Rails */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2">
           <Node
             label="User"
             sublabel="PHP sender"
@@ -106,7 +106,7 @@ export function ArchitectureDiagram() {
         </div>
 
         {/* Row 2: InstaPay → FX → BI-FAST → Morph */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2">
           <Node
             label="InstaPay"
             sublabel="PHP rails"
@@ -146,7 +146,7 @@ export function ArchitectureDiagram() {
         <h3 className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Reward Flow (AFT Token)
         </h3>
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2">
           <Node
             label="Transfer"
             sublabel="SETTLED state"

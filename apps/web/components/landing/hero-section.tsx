@@ -72,7 +72,7 @@ export function HeroSection() {
           SWIFT-Free PHP ↔ IDR Payments
         </motion.p>
 
-        <motion.div variants={fadeUp} className="flex gap-3">
+        <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-[var(--accent-emerald)] text-white hover:bg-[var(--accent-emerald-dark)]">
             <Link href="/send">Send Money</Link>
           </Button>
@@ -89,7 +89,7 @@ export function HeroSection() {
         <motion.form
           onSubmit={handleViewRewards}
           variants={fadeUp}
-          className="flex w-full max-w-xs items-center gap-2"
+          className="flex w-full max-w-sm items-center gap-2"
         >
           <div className="flex w-full flex-col gap-1">
             <div className="flex w-full items-center gap-2">

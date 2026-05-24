@@ -15,7 +15,7 @@ import { ArchitectureDiagram } from "@/components/architecture-diagram";
 
 export default function DemoPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center gap-6 p-8">
+    <main className="min-h-screen flex flex-col items-center gap-4 sm:gap-6 p-4 sm:p-8">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

@@ -86,7 +86,7 @@ export function QuoteCalculator() {
   const displayError = !isAmountValid && amount > 0;
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto overflow-hidden">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
           Send {from} → {to}

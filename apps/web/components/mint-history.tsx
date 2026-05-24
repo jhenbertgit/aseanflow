@@ -65,7 +65,7 @@ export function MintHistory({ rewards, totalCount, showAll, onToggle }: MintHist
             key={reward.txHash}
             className="flex items-center justify-between gap-2 text-sm"
           >
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 overflow-hidden">
               <div className="flex items-center gap-2">
                 <span className="font-medium">
                   {formatTokenAmount(reward.amount)} AFT

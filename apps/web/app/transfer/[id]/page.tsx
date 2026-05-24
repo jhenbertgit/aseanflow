@@ -32,7 +32,7 @@ export default function TransferPage({
   const showError = !!error && !transfer;
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-6 p-8">
+    <main className="flex min-h-screen flex-col items-center gap-4 sm:gap-6 p-4 sm:p-8">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,8 +52,8 @@ export default function TransferPage({
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              Tracking: {trackingCode}
+            <CardTitle className="flex flex-wrap items-center gap-2 text-base sm:text-lg">
+              <span className="break-all">Tracking: {trackingCode}</span>
               {transfer && (
                 <Badge
                   variant={
@@ -107,21 +107,21 @@ export default function TransferPage({
                   className="space-y-6"
                 >
                   <div className="space-y-2 rounded-lg bg-muted/50 p-4">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm gap-2">
                       <span className="text-muted-foreground">You send</span>
                       <span>
                         {CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.sendAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm gap-2">
                       <span className="text-muted-foreground">They receive</span>
                       <span>
                         {CURRENCY_SYMBOLS[transfer.targetCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.receiveAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm gap-2">
                       <span className="text-muted-foreground">Rate</span>
                       <span>
                         1 {transfer.sourceCurrency} ={" "}
@@ -129,7 +129,7 @@ export default function TransferPage({
                         {transfer.targetCurrency}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm gap-2">
                       <span className="text-muted-foreground">Fee</span>
                       <span>{CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}{Number(transfer.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
