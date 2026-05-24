@@ -1,7 +1,13 @@
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import Decimal from 'decimal.js';
 import { FxService } from './fx.service';
 import { WalletService } from '../wallet/wallet.service';
+
+jest.mock('@aseanflow/database', () => ({
+  ...jest.requireActual('@aseanflow/database'),
+  Prisma: { Decimal },
+}));
 
 describe('FxService', () => {
   let service: FxService;

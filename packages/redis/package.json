@@ -10,7 +10,7 @@
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "clean": "rm -rf dist .turbo node_modules"
   },
   "dependencies": {

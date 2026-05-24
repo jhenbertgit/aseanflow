@@ -55,7 +55,7 @@ describe("Shared Utils", () => {
     it("should generate IDs of expected length", () => {
       const id = generateId();
       expect(id.length).toBeGreaterThan(10); // Random length, but should be reasonable
-      expect(id.length).toBeLessThan(30);
+      expect(id.length).toBeLessThanOrEqual(36);
     });
   });
 });

@@ -39,6 +39,10 @@ export function validatePasswordStrength(password: string): {
   };
 }
 
+export function generateId(): string {
+  return crypto.randomUUID();
+}
+
 /**
  * Sanitize string for safe output
  */

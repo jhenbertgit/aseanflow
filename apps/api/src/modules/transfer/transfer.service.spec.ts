@@ -1,19 +1,41 @@
 import { Test } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import Decimal from 'decimal.js';
 import { TransferService } from './transfer.service';
 import { FxService } from '../fx/fx.service';
 import { PrismaService } from '../../common/services/prisma.service';
 import { WalletService } from '../wallet/wallet.service';
 
+jest.mock('@aseanflow/database', () => ({
+  ...jest.requireActual('@aseanflow/database'),
+  Prisma: { Decimal },
+  TransferStatus: {
+    CREATED: 'CREATED',
+    QUOTE_LOCKED: 'QUOTE_LOCKED',
+    INSTA_PAY_PROCESSING: 'INSTA_PAY_PROCESSING',
+    FX_CONVERSION: 'FX_CONVERSION',
+    BI_FAST_PROCESSING: 'BI_FAST_PROCESSING',
+    SETTLED: 'SETTLED',
+    MORPH_ANCHORED: 'MORPH_ANCHORED',
+  },
+  Currency: { PHP: 'PHP', IDR: 'IDR' },
+}));
+
 describe('TransferService', () => {
   let service: TransferService;
+  let prismaTransferMock: {
+    create: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+  };
   let prisma: {
     transfer: {
       create: jest.Mock;
       findUnique: jest.Mock;
       update: jest.Mock;
     };
+    $transaction: jest.Mock;
   };
   let fxService: { calculateQuote: jest.Mock };
   let redis: { get: jest.Mock; setEx: jest.Mock };
@@ -21,12 +43,14 @@ describe('TransferService', () => {
   let walletService: { findByTrackingCode: jest.Mock; createWallet: jest.Mock };
 
   beforeEach(async () => {
+    prismaTransferMock = {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    };
     prisma = {
-      transfer: {
-        create: jest.fn(),
-        findUnique: jest.fn(),
-        update: jest.fn(),
-      },
+      transfer: prismaTransferMock,
+      $transaction: jest.fn((cb) => cb({ transfer: prismaTransferMock })),
     };
     fxService = { calculateQuote: jest.fn() };
     redis = { get: jest.fn(), setEx: jest.fn() };

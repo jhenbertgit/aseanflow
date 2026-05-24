@@ -111,6 +111,7 @@ export class TransferService {
   }
 
   async advanceStatus(transferId: string, newStatus: TransferStatus) {
+    let oldStatus: TransferStatus;
     const updated = await this.prisma.$transaction(async (tx) => {
       const transfer = await tx.transfer.findUnique({
         where: { id: transferId },
@@ -120,6 +121,7 @@ export class TransferService {
         throw new NotFoundException('Transfer not found');
       }
 
+      oldStatus = transfer.status;
       const statusOrder = getStatusOrder(transfer.sourceCurrency);
       const currentIndex = statusOrder.indexOf(transfer.status);
       const newIndex = statusOrder.indexOf(newStatus);
@@ -138,7 +140,7 @@ export class TransferService {
 
     this.eventEmitter.emit(TransferEvents.STATUS_CHANGED, {
       transferId,
-      oldStatus: updated.status,
+      oldStatus: oldStatus!,
       newStatus,
       timestamp: Date.now(),
     });
