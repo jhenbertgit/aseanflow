@@ -133,6 +133,15 @@ export default function TransferPage({
                       <span className="text-muted-foreground">Fee</span>
                       <span>{CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}{Number(transfer.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
+                    <hr className="border-border" />
+                    <div className="flex justify-between text-sm gap-2">
+                      <span className="text-muted-foreground">Recipient</span>
+                      {transfer.recipientType === "WALLET" ? (
+                        <span>Wallet •••{transfer.recipientWalletId?.slice(-4) ?? "????"}</span>
+                      ) : (
+                        <span>{transfer.recipientName} • {transfer.recipientBank} •••{transfer.recipientAccount?.slice(-4) ?? "????"}</span>
+                      )}
+                    </div>
                   </div>
 
                   <TransferTimeline currentStatus={transfer.status} sourceCurrency={transfer.sourceCurrency} />
