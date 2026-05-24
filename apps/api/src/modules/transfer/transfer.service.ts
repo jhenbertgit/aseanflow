@@ -93,6 +93,11 @@ export class TransferService {
         fee: new Prisma.Decimal(quote.fee),
         status: 'CREATED',
         walletId,
+        recipientType: dto.recipientType as 'WALLET' | 'BANK',
+        recipientWalletId: dto.recipientWalletId || null,
+        recipientName: dto.recipientName || null,
+        recipientBank: dto.recipientBank || null,
+        recipientAccount: dto.recipientAccount || null,
       },
     });
 
