@@ -1,34 +1,39 @@
 import { Worker, Queue } from "bullmq";
-import { processSettlement } from "./settlement.processor.js";
-import { processMorphAnchor } from "./morph-anchor.processor.js";
-import { processRewardMint } from "./reward-mint.processor.js";
+import { createPrismaClient } from "@aseanflow/database";
+import { createSettlementProcessor } from "./settlement.processor.js";
+import { createMorphAnchorProcessor } from "./morph-anchor.processor.js";
+import { createRewardMintProcessor } from "./reward-mint.processor.js";
 
 const connection = {
   host: process.env.REDIS_HOST || "localhost",
   port: Number(process.env.REDIS_PORT) || 6380,
 };
 
-const settlementWorker = new Worker("settlement", processSettlement, {
-  connection,
-  concurrency: 5,
-});
+const prisma = createPrismaClient();
 
-const morphAnchorWorker = new Worker("morph-anchor", processMorphAnchor, {
-  connection,
-  concurrency: 3,
-});
+const settlementWorker = new Worker(
+  "settlement",
+  createSettlementProcessor(prisma),
+  { connection, concurrency: 5 },
+);
 
-const rewardMintWorker = new Worker("reward-mint", processRewardMint, {
-  connection,
-  concurrency: 3,
-});
+const morphAnchorWorker = new Worker(
+  "morph-anchor",
+  createMorphAnchorProcessor(prisma),
+  { connection, concurrency: 3 },
+);
+
+const rewardMintWorker = new Worker(
+  "reward-mint",
+  createRewardMintProcessor(prisma),
+  { connection, concurrency: 3 },
+);
 
 settlementWorker.on("completed", (job) => {
   console.log(
     `[settlement] completed: ${job.id} -> ${JSON.stringify(job.returnvalue)}`,
   );
 
-  // Queue morph-anchor after settlement completes
   const morphQueue = new Queue("morph-anchor", { connection });
   morphQueue
     .add("anchor", { transferId: job.returnvalue.transferId })
@@ -37,7 +42,6 @@ settlementWorker.on("completed", (job) => {
       console.error("[settlement] failed to queue morph-anchor:", err),
     );
 
-  // Queue reward-mint after settlement completes
   const rewardQueue = new Queue("reward-mint", { connection });
   rewardQueue
     .add("mint", { transferId: job.returnvalue.transferId })
@@ -76,6 +80,7 @@ process.on("SIGTERM", async () => {
   await settlementWorker.close();
   await morphAnchorWorker.close();
   await rewardMintWorker.close();
+  await prisma.$disconnect();
   process.exit(0);
 });
 
@@ -84,6 +89,7 @@ process.on("SIGINT", async () => {
   await settlementWorker.close();
   await morphAnchorWorker.close();
   await rewardMintWorker.close();
+  await prisma.$disconnect();
   process.exit(0);
 });
 

@@ -1,11 +1,9 @@
 import type { Job } from "bullmq";
 import { createHash } from "crypto";
 import { ethers } from "ethers";
-import { createPrismaClient } from "@aseanflow/database";
+import type { PrismaClient } from "@aseanflow/database";
 import { Prisma } from "@aseanflow/database";
 import { enqueueTx } from "./morph-tx-queue.js";
-
-const prisma = createPrismaClient();
 
 const ERC20_ABI = [
   "function mint(address to, uint256 amount)",
@@ -41,62 +39,63 @@ function initToken(): void {
 
 initToken();
 
-export async function processRewardMint(
-  job: Job<{ transferId: string }>,
-): Promise<{ transferId: string; status: string; txHash?: string }> {
-  const { transferId } = job.data;
+export function createRewardMintProcessor(prisma: PrismaClient) {
+  return async function processRewardMint(
+    job: Job<{ transferId: string }>,
+  ): Promise<{ transferId: string; status: string; txHash?: string }> {
+    const { transferId } = job.data;
 
-  const transfer = await prisma.transfer.findUnique({
-    where: { id: transferId },
-    include: { wallet: true },
-  });
-
-  if (!transfer?.wallet) {
-    job.log(`No wallet for transfer ${transferId} — skipping`);
-    return { transferId, status: "SKIPPED" };
-  }
-
-  if (transfer.rewardTxHash) {
-    job.log(`Already minted for transfer ${transferId}`);
-    return { transferId, status: "ALREADY_MINTED" };
-  }
-
-  let txHash: string;
-
-  if (tokenContract) {
-    const result = await enqueueTx(async () => {
-      const tx = await tokenContract!.mint(
-        transfer.wallet!.address,
-        REWARD_AMOUNT,
-      );
-      job.log(`Mint tx submitted: ${tx.hash}`);
-      const receipt = await tx.wait(1);
-      if (!receipt) throw new Error(`Mint tx ${tx.hash} failed — no receipt`);
-      return tx.hash;
+    const transfer = await prisma.transfer.findUnique({
+      where: { id: transferId },
+      include: { wallet: true },
     });
-    txHash = result;
-    job.log(`Mint confirmed: ${MORPH_EXPLORER}/tx/${txHash}`);
-  } else {
-    // Mock mode
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    txHash =
-      "0x" +
-      createHash("sha256")
-        .update(transferId + Date.now())
-        .digest("hex");
-    job.log(`Mock mint: ${txHash}`);
-  }
 
-  await prisma.transfer.update({
-    where: { id: transferId },
-    data: {
-      rewardTxHash: txHash,
-      rewardAmount: new Prisma.Decimal(REWARD_AMOUNT),
-    },
-  });
+    if (!transfer?.wallet) {
+      job.log(`No wallet for transfer ${transferId} — skipping`);
+      return { transferId, status: "SKIPPED" };
+    }
 
-  job.log(`Transfer ${transferId} rewarded with 10 AFT`);
-  return { transferId, status: "REWARDED", txHash };
+    if (transfer.rewardTxHash) {
+      job.log(`Already minted for transfer ${transferId}`);
+      return { transferId, status: "ALREADY_MINTED" };
+    }
+
+    let txHash: string;
+
+    if (tokenContract) {
+      const result = await enqueueTx(async () => {
+        const tx = await tokenContract!.mint(
+          transfer.wallet!.address,
+          REWARD_AMOUNT,
+        );
+        job.log(`Mint tx submitted: ${tx.hash}`);
+        const receipt = await tx.wait(1);
+        if (!receipt) throw new Error(`Mint tx ${tx.hash} failed — no receipt`);
+        return tx.hash;
+      });
+      txHash = result;
+      job.log(`Mint confirmed: ${MORPH_EXPLORER}/tx/${txHash}`);
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      txHash =
+        "0x" +
+        createHash("sha256")
+          .update(transferId + Date.now())
+          .digest("hex");
+      job.log(`Mock mint: ${txHash}`);
+    }
+
+    await prisma.transfer.update({
+      where: { id: transferId },
+      data: {
+        rewardTxHash: txHash,
+        rewardAmount: new Prisma.Decimal(REWARD_AMOUNT),
+      },
+    });
+
+    job.log(`Transfer ${transferId} rewarded with 10 AFT`);
+    return { transferId, status: "REWARDED", txHash };
+  };
 }
 
-export default processRewardMint;
+export default createRewardMintProcessor;

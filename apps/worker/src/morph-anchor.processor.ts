@@ -1,10 +1,8 @@
 import type { Job } from "bullmq";
 import { createHash } from "crypto";
 import { ethers } from "ethers";
-import { createPrismaClient } from "@aseanflow/database";
+import type { PrismaClient } from "@aseanflow/database";
 import { enqueueTx } from "./morph-tx-queue.js";
-
-const prisma = createPrismaClient();
 
 // Morph Hoodi Testnet
 const MORPH_RPC =
@@ -114,39 +112,41 @@ async function submitMock(proofHash: string): Promise<{
   return { txHash, blockNumber: Math.floor(Date.now() / 1000) };
 }
 
-export async function processMorphAnchor(
-  job: Job<{ transferId: string }>,
-): Promise<{ transferId: string; status: string; proofHash: string }> {
-  const { transferId } = job.data;
+export function createMorphAnchorProcessor(prisma: PrismaClient) {
+  return async function processMorphAnchor(
+    job: Job<{ transferId: string }>,
+  ): Promise<{ transferId: string; status: string; proofHash: string }> {
+    const { transferId } = job.data;
 
-  const transfer = await prisma.transfer.findUnique({
-    where: { id: transferId },
-  });
+    const transfer = await prisma.transfer.findUnique({
+      where: { id: transferId },
+    });
 
-  if (!transfer) {
-    throw new Error(`Transfer ${transferId} not found for morph anchoring`);
-  }
+    if (!transfer) {
+      throw new Error(`Transfer ${transferId} not found for morph anchoring`);
+    }
 
-  if (transfer.status !== "SETTLED") {
-    throw new Error(
-      `Transfer ${transferId} not SETTLED (current: ${transfer.status})`,
-    );
-  }
+    if (transfer.status !== "SETTLED") {
+      throw new Error(
+        `Transfer ${transferId} not SETTLED (current: ${transfer.status})`,
+      );
+    }
 
-  const proofHash = generateProof(transfer);
-  job.log(`Proof hash: ${proofHash}`);
+    const proofHash = generateProof(transfer);
+    job.log(`Proof hash: ${proofHash}`);
 
-  const result = await enqueueTx(() => submitToMorph(proofHash));
-  job.log(`Morph tx: ${result.txHash}`);
+    const result = await enqueueTx(() => submitToMorph(proofHash));
+    job.log(`Morph tx: ${result.txHash}`);
 
-  await prisma.transfer.update({
-    where: { id: transferId },
-    data: { status: "MORPH_ANCHORED", morphTxHash: result.txHash },
-  });
+    await prisma.transfer.update({
+      where: { id: transferId },
+      data: { status: "MORPH_ANCHORED", morphTxHash: result.txHash },
+    });
 
-  job.log(`Transfer ${transferId} → MORPH_ANCHORED`);
+    job.log(`Transfer ${transferId} → MORPH_ANCHORED`);
 
-  return { transferId, status: "MORPH_ANCHORED", proofHash };
+    return { transferId, status: "MORPH_ANCHORED", proofHash };
+  };
 }
 
-export default processMorphAnchor;
+export default createMorphAnchorProcessor;

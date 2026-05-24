@@ -17,7 +17,7 @@ services:
       - "443:443"
       # 8080 removed — traefik dashboard must not be public
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt
     networks:
       - aseanflow
@@ -45,7 +45,7 @@ services:
     image: redis:7-alpine
     container_name: aseanflow-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy volatile-lru
     volumes:
       - redis_data:/data
     networks:
@@ -123,7 +123,7 @@ services:
       MORPH_PRIVATE_KEY: ${MORPH_PRIVATE_KEY:-}
       REWARD_TOKEN_ADDRESS: ${REWARD_TOKEN_ADDRESS:-}
       DEPLOYER_PRIVATE_KEY: ${DEPLOYER_PRIVATE_KEY:-}
-    depends_on:
+      REWARD_AMOUNT: ${REWARD_AMOUNT:-10000000000000000000}
       postgres:
         condition: service_healthy
       redis:
