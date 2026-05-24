@@ -5,6 +5,8 @@ import {
   IsString,
   Max,
   Min,
+  Length,
+  Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CurrenciesDiffer } from '../../../common/decorators/currencies-differ.decorator';
@@ -42,4 +44,44 @@ export class CreateTransferDto {
   @IsOptional()
   @IsString()
   trackingCode?: string;
+
+  @ApiProperty({ example: 'WALLET', enum: ['WALLET', 'BANK'] })
+  @IsEnum(['WALLET', 'BANK'])
+  recipientType!: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'ASEANFlow wallet ID (required when recipientType is WALLET)',
+  })
+  @IsOptional()
+  @IsString()
+  recipientWalletId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Recipient full name (required when recipientType is BANK)',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(2, 100)
+  recipientName?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Bank code (required when recipientType is BANK)',
+  })
+  @IsOptional()
+  @IsString()
+  recipientBank?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Bank account number (required when recipientType is BANK)',
+  })
+  @IsOptional()
+  @IsString()
+  @Matches(/^[0-9]{6,20}$/, {
+    message: 'Account number must be 6-20 digits',
+  })
+  recipientAccount?: string;
 }
