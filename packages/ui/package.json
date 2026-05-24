@@ -14,8 +14,10 @@
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
@@ -28,6 +30,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@aseanflow/eslint-config": "workspace:*",
+    "@aseanflow/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
@@ -36,8 +40,6 @@
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "@aseanflow/eslint-config": "workspace:*",
-    "@aseanflow/tsconfig": "workspace:*",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "tailwindcss": "^4.1.11",

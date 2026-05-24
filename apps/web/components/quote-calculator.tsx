@@ -12,11 +12,20 @@ import {
   CardTitle,
 } from "@aseanflow/ui/components/card";
 import { Input } from "@aseanflow/ui/components/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@aseanflow/ui/components/select";
+import { Tabs, TabsList, TabsTrigger } from "@aseanflow/ui/components/tabs";
 
 import { LoadingState } from "@/components/ui/loading-state";
 import { RewardBadge } from "@/components/reward-badge";
 import { useCreateTransfer, useQuote, useWallet } from "@/lib/api/hooks";
 import { CURRENCY_SYMBOLS } from "@/lib/constants";
+import { INDONESIAN_BANKS } from "@aseanflow/shared";
 
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 1_000_000;
@@ -24,18 +33,29 @@ const ETA_SECONDS = "~10 seconds";
 const TRACKING_CODE_RE = /^TXN[A-Z0-9]{3,12}$/;
 
 type Direction = "PHP_TO_IDR" | "IDR_TO_PHP";
+type RecipientMode = "WALLET" | "BANK";
 
 export function QuoteCalculator() {
   const [amount, setAmount] = useState<number>(1000);
   const [trackingCode, setTrackingCode] = useState("");
   const [direction, setDirection] = useState<Direction>("PHP_TO_IDR");
+  const [recipientMode, setRecipientMode] = useState<RecipientMode>("WALLET");
+
+  // Wallet recipient
+  const [recipientWalletId, setRecipientWalletId] = useState("");
+
+  // Bank recipient
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientBank, setRecipientBank] = useState("");
+  const [recipientAccount, setRecipientAccount] = useState("");
 
   const from = direction === "PHP_TO_IDR" ? "PHP" : "IDR";
   const to = direction === "PHP_TO_IDR" ? "IDR" : "PHP";
   const sourceSymbol = CURRENCY_SYMBOLS[from];
   const targetSymbol = CURRENCY_SYMBOLS[to];
 
-  const trackingCodeValid = !!trackingCode && TRACKING_CODE_RE.test(trackingCode);
+  const trackingCodeValid =
+    !!trackingCode && TRACKING_CODE_RE.test(trackingCode);
   const { data: quote, isLoading, error: quoteError } = useQuote(
     amount,
     from,
@@ -53,6 +73,16 @@ export function QuoteCalculator() {
   const isSubmitting = createTransfer.isPending;
   const trackingCodeInvalid = !!trackingCode && !trackingCodeValid;
 
+  const isWalletRecipientValid = recipientWalletId.trim().length > 0;
+  const isBankRecipientValid =
+    recipientName.trim().length >= 2 &&
+    recipientBank.length > 0 &&
+    /^\d{6,20}$/.test(recipientAccount);
+  const isRecipientValid =
+    recipientMode === "WALLET"
+      ? isWalletRecipientValid
+      : isBankRecipientValid;
+
   function handleAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
     if (raw === "") {
@@ -65,21 +95,34 @@ export function QuoteCalculator() {
     }
   }
 
-  function handleTrackingCodeChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleTrackingCodeChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
     setTrackingCode(e.target.value.trim());
   }
 
   function handleSwap() {
-    setDirection((d) => (d === "PHP_TO_IDR" ? "IDR_TO_PHP" : "PHP_TO_IDR"));
+    setDirection((d) =>
+      d === "PHP_TO_IDR" ? "IDR_TO_PHP" : "PHP_TO_IDR",
+    );
   }
 
   function handleContinue() {
-    if (!isAmountValid || isSubmitting) return;
+    if (!isAmountValid || !quote || isSubmitting || !isRecipientValid) return;
+
     createTransfer.mutate({
       amount,
       from,
       to,
       trackingCode: trackingCode || undefined,
+      recipientType: recipientMode,
+      ...(recipientMode === "WALLET"
+        ? { recipientWalletId: recipientWalletId.trim() }
+        : {
+            recipientName: recipientName.trim(),
+            recipientBank,
+            recipientAccount,
+          }),
     });
   }
 
@@ -103,6 +146,7 @@ export function QuoteCalculator() {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Amount input */}
         <div className="space-y-2">
           <label htmlFor="amount" className="text-sm font-medium">
             You send ({from})
@@ -124,12 +168,14 @@ export function QuoteCalculator() {
           </div>
           {displayError && (
             <p className="text-sm text-destructive">
-              Amount must be between {sourceSymbol}{MIN_AMOUNT} and{" "}
-              {sourceSymbol}{MAX_AMOUNT.toLocaleString()}
+              Amount must be between {sourceSymbol}
+              {MIN_AMOUNT} and {sourceSymbol}
+              {MAX_AMOUNT.toLocaleString()}
             </p>
           )}
         </div>
 
+        {/* Tracking code */}
         <div className="space-y-2">
           <label htmlFor="trackingCode" className="text-sm font-medium">
             Tracking code (optional)
@@ -144,7 +190,8 @@ export function QuoteCalculator() {
           {wallet && <RewardBadge balance={wallet.balance} />}
           {trackingCodeInvalid && (
             <p className="text-xs text-destructive">
-              Invalid format. Expected: TXN + uppercase letters/numbers (e.g. TXNABC123XYZ).
+              Invalid format. Expected: TXN + uppercase letters/numbers (e.g.
+              TXNABC123XYZ).
             </p>
           )}
           {!trackingCodeInvalid && walletNotFound && (
@@ -154,6 +201,7 @@ export function QuoteCalculator() {
           )}
         </div>
 
+        {/* Quote display */}
         <AnimatePresence mode="wait">
           {isLoading && (
             <motion.div
@@ -188,11 +236,24 @@ export function QuoteCalculator() {
             >
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Exchange Rate</span>
-                <span>1 {from} = {quote.rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {to}</span>
+                <span>
+                  1 {from} ={" "}
+                  {quote.rate.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 4,
+                  })}{" "}
+                  {to}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Fee</span>
-                <span>{sourceSymbol} {quote.fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>
+                  {sourceSymbol}{" "}
+                  {quote.fee.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">ETA</span>
@@ -218,11 +279,127 @@ export function QuoteCalculator() {
               <hr className="border-border" />
               <div className="flex justify-between font-semibold">
                 <span>They receive</span>
-                <span>{targetSymbol} {quote.receiveAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>
+                  {targetSymbol}{" "}
+                  {quote.receiveAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Recipient section */}
+        <div className="space-y-3 pt-2">
+          <Tabs
+            value={recipientMode}
+            onValueChange={(v) =>
+              setRecipientMode(v as RecipientMode)
+            }
+          >
+            <TabsList className="w-full">
+              <TabsTrigger value="WALLET" className="flex-1">
+                ASEANFlow Wallet
+              </TabsTrigger>
+              <TabsTrigger value="BANK" className="flex-1">
+                Bank Account
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <AnimatePresence mode="wait">
+            {recipientMode === "WALLET" ? (
+              <motion.div
+                key="wallet"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="space-y-2"
+              >
+                <label
+                  htmlFor="recipientWalletId"
+                  className="text-sm font-medium"
+                >
+                  Recipient Wallet ID
+                </label>
+                <Input
+                  id="recipientWalletId"
+                  type="text"
+                  value={recipientWalletId}
+                  onChange={(e) =>
+                    setRecipientWalletId(e.target.value.trim())
+                  }
+                  placeholder="Enter recipient's wallet ID"
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="bank"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="space-y-2"
+              >
+                <div className="space-y-2">
+                  <label
+                    htmlFor="recipientName"
+                    className="text-sm font-medium"
+                  >
+                    Recipient Name
+                  </label>
+                  <Input
+                    id="recipientName"
+                    type="text"
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    placeholder="Full name as on bank account"
+                    maxLength={100}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Bank</label>
+                  <Select
+                    value={recipientBank}
+                    onValueChange={setRecipientBank}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INDONESIAN_BANKS.map((bank) => (
+                        <SelectItem key={bank.code} value={bank.code}>
+                          {bank.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="recipientAccount"
+                    className="text-sm font-medium"
+                  >
+                    Account Number
+                  </label>
+                  <Input
+                    id="recipientAccount"
+                    type="text"
+                    value={recipientAccount}
+                    onChange={(e) =>
+                      setRecipientAccount(
+                        e.target.value.replace(/\D/g, "").slice(0, 20),
+                      )
+                    }
+                    placeholder="6-20 digit account number"
+                    maxLength={20}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {createTransfer.error && (
           <p className="text-sm text-destructive text-center">
@@ -236,7 +413,7 @@ export function QuoteCalculator() {
           className="w-full"
           size="lg"
           onClick={handleContinue}
-          disabled={!isAmountValid || !quote || isSubmitting}
+          disabled={!isAmountValid || !quote || isSubmitting || !isRecipientValid}
         >
           {isSubmitting ? "Processing..." : "Continue Transfer"}
         </Button>
