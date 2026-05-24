@@ -1,5 +1,6 @@
 import {
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -72,6 +73,7 @@ export class CreateTransferDto {
   })
   @IsOptional()
   @IsString()
+  @IsIn(['BCA', 'BNI', 'BRI', 'MANDIRI', 'PERMATA', 'BSI', 'CIMB', 'DANAMON', 'MEGA', 'PANIN'])
   recipientBank?: string;
 
   @ApiProperty({
