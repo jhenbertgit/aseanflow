@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../common/services/prisma.service';
 import { ethers } from 'ethers';
@@ -12,7 +12,7 @@ const ERC20_ABI = [
 ];
 
 @Injectable()
-export class WalletService {
+export class WalletService implements OnModuleInit {
   private readonly logger = new Logger(WalletService.name);
   private provider: ethers.JsonRpcProvider | null = null;
   private tokenContract: ethers.Contract | null = null;
@@ -43,6 +43,18 @@ export class WalletService {
     }
   }
 
+  onModuleInit() {
+    const key = this.config.get<string>('WALLET_ENCRYPTION_KEY', '');
+    if (!key || key.length !== 64 || !/^[0-9a-fA-F]{64}$/.test(key)) {
+      this.logger.error(
+        'WALLET_ENCRYPTION_KEY must be exactly 64 hex characters. Wallet encryption will fail.',
+      );
+      throw new Error(
+        'WALLET_ENCRYPTION_KEY must be exactly 64 hex characters (256-bit). Set it in your environment.',
+      );
+    }
+  }
+
   async createWallet() {
     const rawWallet = ethers.Wallet.createRandom();
     const encrypted = this.encryptPrivateKey(rawWallet.privateKey);
@@ -66,15 +78,7 @@ export class WalletService {
 
     if (!transfer) return null;
 
-    if (transfer.wallet) return transfer.wallet;
-
-    const wallet = await this.createWallet();
-    await this.prisma.transfer.update({
-      where: { id: transfer.id },
-      data: { walletId: wallet.id },
-    });
-
-    return wallet;
+    return transfer.wallet;
   }
 
   async getBalance(address: string): Promise<string> {
