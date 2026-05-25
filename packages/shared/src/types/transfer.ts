@@ -89,3 +89,35 @@ export interface TransferDetailResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+// Dashboard types
+
+export interface UserResponse {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface AccountWalletResponse {
+  id: string;
+  currency: string;
+  balance: string;
+}
+
+export interface TransferListItem {
+  trackingCode: string;
+  status: string;
+  sendAmount: number;
+  receiveAmount: number;
+  sourceCurrency: string;
+  targetCurrency: string;
+  fee: number;
+  createdAt: string;
+}
+
+export interface DashboardResponse {
+  user: UserResponse;
+  wallets: AccountWalletResponse[];
+  recentTransfers: TransferListItem[];
+  totalTransfers: number;
+}
