@@ -51,6 +51,7 @@ model Transfer {
   recipientAccount  String?
   recipientWalletId String?
 
+  senderId       String?
   walletId       String?
   rewardTxHash   String?
   rewardAmount   Decimal?       @db.Decimal(48, 18)
@@ -58,10 +59,12 @@ model Transfer {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
+  sender         User?          @relation(fields: [senderId], references: [id])
   ledgerEntries  LedgerEntry[]
-  wallet         Wallet?        @relation(fields: [walletId], references: [id])
+  rewardWallet   RewardWallet?  @relation(fields: [walletId], references: [id])
 
   @@index([trackingCode])
+  @@index([senderId])
   @@map("transfers")
 }
 
@@ -81,7 +84,32 @@ model LedgerEntry {
   @@map("ledger_entries")
 }
 
-model Wallet {
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  cookieToken String   @unique
+  createdAt   DateTime @default(now())
+
+  wallets    AccountWallet[]
+  transfers  Transfer[]
+
+  @@map("users")
+}
+
+model AccountWallet {
+  id        String   @id @default(cuid())
+  userId    String
+  currency  Currency
+  balance   Decimal  @db.Decimal(18, 2) @default("0.00")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, currency])
+  @@map("account_wallets")
+}
+
+model RewardWallet {
   id                  String     @id @default(cuid())
   address             String     @unique
   encryptedPrivateKey String
@@ -90,5 +118,5 @@ model Wallet {
   transfers           Transfer[]
 
   @@index([address])
-  @@map("wallets")
+  @@map("reward_wallets")
 }
