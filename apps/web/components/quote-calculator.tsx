@@ -25,7 +25,7 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { RewardBadge } from "@/components/reward-badge";
 import { useCreateTransfer, useQuote, useWallet } from "@/lib/api/hooks";
 import { CURRENCY_SYMBOLS } from "@/lib/constants";
-import { INDONESIAN_BANKS } from "@aseanflow/shared";
+import { INDONESIAN_BANKS, PHILIPPINE_BANKS } from "@aseanflow/shared";
 
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 1_000_000;
@@ -53,6 +53,7 @@ export function QuoteCalculator() {
   const to = direction === "PHP_TO_IDR" ? "IDR" : "PHP";
   const sourceSymbol = CURRENCY_SYMBOLS[from];
   const targetSymbol = CURRENCY_SYMBOLS[to];
+  const bankList = to === "IDR" ? INDONESIAN_BANKS : PHILIPPINE_BANKS;
 
   const trackingCodeValid =
     !!trackingCode && TRACKING_CODE_RE.test(trackingCode);
@@ -105,6 +106,7 @@ export function QuoteCalculator() {
     setDirection((d) =>
       d === "PHP_TO_IDR" ? "IDR_TO_PHP" : "PHP_TO_IDR",
     );
+    setRecipientBank("");
   }
 
   function handleContinue() {
@@ -202,8 +204,8 @@ export function QuoteCalculator() {
         </div>
 
         {/* Quote display */}
-        <AnimatePresence mode="wait">
-          {isLoading && (
+        <AnimatePresence mode="popLayout">
+          {isLoading && !quote && (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
@@ -214,7 +216,7 @@ export function QuoteCalculator() {
             </motion.div>
           )}
 
-          {quoteError && (
+          {quoteError && !quote && (
             <motion.div
               key="error"
               initial={{ opacity: 0 }}
@@ -368,7 +370,7 @@ export function QuoteCalculator() {
                       <SelectValue placeholder="Select bank" />
                     </SelectTrigger>
                     <SelectContent>
-                      {INDONESIAN_BANKS.map((bank) => (
+                      {bankList.map((bank) => (
                         <SelectItem key={bank.code} value={bank.code}>
                           {bank.name}
                         </SelectItem>

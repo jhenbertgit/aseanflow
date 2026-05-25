@@ -73,7 +73,28 @@ export class CreateTransferDto {
   })
   @IsOptional()
   @IsString()
-  @IsIn(['BCA', 'BNI', 'BRI', 'MANDIRI', 'PERMATA', 'BSI', 'CIMB', 'DANAMON', 'MEGA', 'PANIN'])
+  @IsIn([
+    'BCA',
+    'BNI',
+    'BRI',
+    'MANDIRI',
+    'PERMATA',
+    'BSI',
+    'CIMB',
+    'DANAMON',
+    'MEGA',
+    'PANIN',
+    'BDO',
+    'BPI',
+    'METROBANK',
+    'PNB',
+    'SECURITYBANK',
+    'UNIONBANK',
+    'CHINABANK',
+    'RCBC',
+    'MAYBANK',
+    'AUB',
+  ])
   recipientBank?: string;
 
   @ApiProperty({
