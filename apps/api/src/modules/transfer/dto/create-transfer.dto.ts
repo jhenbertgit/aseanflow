@@ -46,6 +46,14 @@ export class CreateTransferDto {
   @IsString()
   trackingCode?: string;
 
+  @ApiProperty({
+    required: false,
+    description: 'Sender user ID',
+  })
+  @IsOptional()
+  @IsString()
+  senderId?: string;
+
   @ApiProperty({ example: 'WALLET', enum: ['WALLET', 'BANK'] })
   @IsEnum(['WALLET', 'BANK'])
   recipientType!: string;

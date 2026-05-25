@@ -98,6 +98,7 @@ export class TransferService {
         recipientName: dto.recipientName || null,
         recipientBank: dto.recipientBank || null,
         recipientAccount: dto.recipientAccount || null,
+        senderId: dto.senderId || null,
       },
     });
 
@@ -164,6 +165,13 @@ export class TransferService {
     }
 
     return transfer;
+  }
+
+  async getTransfersByUser(userId: string) {
+    return this.prisma.transfer.findMany({
+      where: { senderId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   private generateTrackingCode(): string {

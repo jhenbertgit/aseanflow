@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Inject } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Queue } from 'bullmq';
 import { TransferService } from './transfer.service';
@@ -39,6 +39,13 @@ export class TransferController {
     });
 
     return transfer;
+  }
+
+  @Get('transfers')
+  @ApiOperation({ summary: 'List transfers for a user' })
+  async listTransfers(@Query('userId') userId: string) {
+    if (!userId) return [];
+    return this.transferService.getTransfersByUser(userId);
   }
 
   @Get('transfer/:trackingCode')
