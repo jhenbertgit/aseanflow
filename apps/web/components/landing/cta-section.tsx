@@ -16,14 +16,14 @@ export function CtaSection() {
         className="mx-auto flex max-w-md flex-col items-center gap-6 text-center"
       >
         <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
-          Start Sending Money Today
+          Get Started with ASEANFlow
         </h2>
         <Button
           asChild
           size="lg"
           className="bg-[var(--accent-emerald)] px-8 text-white hover:bg-[var(--accent-emerald-dark)]"
         >
-          <Link href="/send">Send Money</Link>
+          <Link href="/send">Open Dashboard</Link>
         </Button>
         <p className="text-sm text-[var(--accent-gold)]">
           Earn AFT on every transfer ⭐

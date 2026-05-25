@@ -4,10 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@aseanflow/ui/components/button";
-import { Send, Layout, Menu, X } from "lucide-react";
+import { LayoutDashboard, Layout, Menu, X } from "lucide-react";
 
 const navItems = [
-  { name: "Send", href: "/send", icon: Send },
+  { name: "Dashboard", href: "/send", icon: LayoutDashboard },
   { name: "Architecture", href: "/architecture", icon: Layout },
 ];
 

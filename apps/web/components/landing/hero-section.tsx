@@ -74,7 +74,7 @@ export function HeroSection() {
 
         <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-[var(--accent-emerald)] text-white hover:bg-[var(--accent-emerald-dark)]">
-            <Link href="/send">Send Money</Link>
+            <Link href="/send">Open Dashboard</Link>
           </Button>
           <Button
             asChild
