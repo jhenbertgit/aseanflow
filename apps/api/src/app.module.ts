@@ -13,6 +13,7 @@ import { LedgerModule } from './modules/ledger/ledger.module';
 import { MorphModule } from './modules/morph/morph.module';
 import { HealthModule } from './modules/health/health.module';
 import { WalletModule } from './modules/wallet/wallet.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
     MorphModule,
     HealthModule,
     WalletModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [

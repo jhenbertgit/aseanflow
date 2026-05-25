@@ -145,7 +145,7 @@ export class TransferService {
 
     this.eventEmitter.emit(TransferEvents.STATUS_CHANGED, {
       transferId,
-      oldStatus: oldStatus!,
+      oldStatus: oldStatus,
       newStatus,
       timestamp: Date.now(),
     });
@@ -156,7 +156,7 @@ export class TransferService {
   async getByTrackingCode(trackingCode: string) {
     const transfer = await this.prisma.transfer.findUnique({
       where: { trackingCode },
-      include: { ledgerEntries: true, wallet: true },
+      include: { ledgerEntries: true, rewardWallet: true },
     });
 
     if (!transfer) {

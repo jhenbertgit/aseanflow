@@ -59,7 +59,7 @@ export class WalletService implements OnModuleInit {
     const rawWallet = ethers.Wallet.createRandom();
     const encrypted = this.encryptPrivateKey(rawWallet.privateKey);
 
-    const wallet = await this.prisma.wallet.create({
+    const wallet = await this.prisma.rewardWallet.create({
       data: {
         address: rawWallet.address,
         encryptedPrivateKey: encrypted,
@@ -73,12 +73,12 @@ export class WalletService implements OnModuleInit {
   async findByTrackingCode(trackingCode: string) {
     const transfer = await this.prisma.transfer.findUnique({
       where: { trackingCode },
-      include: { wallet: true },
+      include: { rewardWallet: true },
     });
 
     if (!transfer) return null;
 
-    return transfer.wallet;
+    return transfer.rewardWallet;
   }
 
   async getBalance(address: string): Promise<string> {
