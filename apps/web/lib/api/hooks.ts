@@ -10,6 +10,7 @@ import {
 } from "./transfer";
 import { getQuote } from "./quote";
 import { getWalletInfo, getWalletHistory } from "./wallet";
+import { getDashboard } from "./user";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -85,5 +86,14 @@ export function useWalletHistory(trackingCode: string) {
     queryFn: () => getWalletHistory(trackingCode),
     enabled: !!trackingCode,
     staleTime: 30_000,
+  });
+}
+
+export function useDashboard(cookieToken: string | null) {
+  return useQuery({
+    queryKey: ["dashboard", cookieToken],
+    queryFn: () => getDashboard(cookieToken!),
+    enabled: !!cookieToken,
+    staleTime: 15_000,
   });
 }
