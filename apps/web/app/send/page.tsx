@@ -81,7 +81,7 @@ export default function SendPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
       >
-        <QuickSend />
+        <QuickSend userId={dashboard.user.id} />
       </motion.div>
 
       {/* Activity + History grid */}

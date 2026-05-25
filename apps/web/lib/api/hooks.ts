@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -48,10 +48,12 @@ export function useQuote(
 
 export function useCreateTransfer() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: CreateTransferPayload) => createTransfer(payload),
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       router.push(`/transfer/${data.trackingCode}`);
     },
   });

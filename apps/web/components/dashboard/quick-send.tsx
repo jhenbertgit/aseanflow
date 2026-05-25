@@ -28,7 +28,11 @@ import { INDONESIAN_BANKS, PHILIPPINE_BANKS } from "@aseanflow/shared";
 type Direction = "PHP_TO_IDR" | "IDR_TO_PHP";
 type RecipientMode = "WALLET" | "BANK";
 
-export function QuickSend() {
+interface QuickSendProps {
+  userId?: string;
+}
+
+export function QuickSend({ userId }: QuickSendProps) {
   const [amount, setAmount] = useState<number>(1000);
   const [direction, setDirection] = useState<Direction>("PHP_TO_IDR");
   const [recipientMode, setRecipientMode] = useState<RecipientMode>("WALLET");
@@ -68,6 +72,7 @@ export function QuickSend() {
       amount,
       from,
       to,
+      senderId: userId,
       recipientType: recipientMode,
       ...(recipientMode === "WALLET"
         ? { recipientWalletId: recipientWalletId.trim() }

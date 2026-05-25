@@ -7,6 +7,7 @@ export interface CreateTransferPayload {
   amount: number;
   from: string;
   to: string;
+  senderId?: string;
   trackingCode?: string;
   recipientType: "WALLET" | "BANK";
   recipientWalletId?: string;
