@@ -2,3 +2,15 @@ packages:
   - "apps/*"
   - "apps/worker/contracts"
   - "packages/*"
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/engines': true
+  '@tailwindcss/oxide': true
+  core-js-pure: true
+  esbuild: true
+  keccak: true
+  msgpackr-extract: true
+  prisma: true
+  secp256k1: true
+  sharp: true
+  unrs-resolver: true

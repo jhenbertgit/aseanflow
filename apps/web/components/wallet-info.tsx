@@ -37,16 +37,16 @@ export function WalletInfo({ address, balance }: WalletInfoProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <a
             href={explorerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-sm hover:underline"
+            className="min-h-[44px] flex items-center font-mono text-sm hover:underline truncate"
           >
             {truncated}
           </a>
-          <Button variant="ghost" size="sm" onClick={copyAddress}>
+          <Button variant="ghost" size="sm" onClick={copyAddress} className="shrink-0 min-h-[44px]">
             {copied ? "Copied" : "Copy"}
           </Button>
         </div>

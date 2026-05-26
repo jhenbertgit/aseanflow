@@ -54,7 +54,9 @@ describe('TransferService', () => {
     prisma = {
       transfer: prismaTransferMock,
       user: {
-        findUnique: jest.fn().mockResolvedValue({ id: 'user-1', accountNumber: 'wallet-1' }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'user-1', accountNumber: 'wallet-1' }),
       },
       $transaction: jest.fn((cb) => cb({ transfer: prismaTransferMock })),
     };

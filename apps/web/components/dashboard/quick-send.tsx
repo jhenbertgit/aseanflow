@@ -51,7 +51,7 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
   const { data: quote, isLoading } = useQuote(amount, from, to);
   const createTransfer = useCreateTransfer();
 
-  const isAmountValid = amount >= 1 && amount <= 1_000_000_000;
+  const isAmountValid = amount >= 1 && amount <= 1_000_000;
   const isSubmitting = createTransfer.isPending;
 
   const isWalletRecipientValid = recipientAccountNumber.trim().length > 0;
@@ -111,10 +111,10 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
               <Input
                 type="number"
                 min={1}
-                max={1_000_000_000}
+                max={1_000_000}
                 value={amount || ""}
                 onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                className={`pl-8 ${amount > 1_000_000_000 ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                className={`pl-8 ${amount > 1_000_000 ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 placeholder="Amount"
               />
             </div>
@@ -122,9 +122,9 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
               → {to}
             </div>
           </div>
-          {amount > 1_000_000_000 && (
+          {amount > 1_000_000 && (
             <p className="text-xs text-destructive">
-              Max amount is {sourceSymbol}1,000,000,000
+              Max amount is {sourceSymbol}1,000,000
             </p>
           )}
         </div>

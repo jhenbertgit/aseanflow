@@ -1,15 +1,6 @@
-import { sleep, formatDate, isValidEmail, generateId } from "../utils";
+import { formatDate, isValidEmail, truncate } from "../utils";
 
 describe("Shared Utils", () => {
-  describe("sleep", () => {
-    it("should resolve after specified milliseconds", async () => {
-      const start = Date.now();
-      await sleep(100);
-      const end = Date.now();
-      expect(end - start).toBeGreaterThanOrEqual(90); // Allow some tolerance
-    });
-  });
-
   describe("formatDate", () => {
     it("should format date to YYYY-MM-DD", () => {
       const date = new Date("2023-12-25T10:30:00Z");
@@ -39,23 +30,17 @@ describe("Shared Utils", () => {
     });
   });
 
-  describe("generateId", () => {
-    it("should generate a string", () => {
-      const id = generateId();
-      expect(typeof id).toBe("string");
-      expect(id.length).toBeGreaterThan(0);
+  describe("truncate", () => {
+    it("should not truncate short strings", () => {
+      expect(truncate("hello", 10)).toBe("hello");
     });
 
-    it("should generate unique IDs", () => {
-      const id1 = generateId();
-      const id2 = generateId();
-      expect(id1).not.toBe(id2);
+    it("should truncate long strings with default suffix", () => {
+      expect(truncate("hello world", 8)).toBe("hello...");
     });
 
-    it("should generate IDs of expected length", () => {
-      const id = generateId();
-      expect(id.length).toBeGreaterThan(10); // Random length, but should be reasonable
-      expect(id.length).toBeLessThanOrEqual(36);
+    it("should use custom suffix", () => {
+      expect(truncate("hello world", 9, "…")).toBe("hello wo…");
     });
   });
 });

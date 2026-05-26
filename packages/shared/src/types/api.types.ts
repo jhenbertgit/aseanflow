@@ -6,14 +6,6 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
-export interface ApiError {
-  statusCode: number;
-  message: string | string[];
-  error: string;
-  timestamp: string;
-  path: string;
-}
-
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -27,18 +19,6 @@ export interface PaginatedResponse<T> {
   success: boolean;
   data: T[];
   meta: PaginationMeta;
-}
-
-export interface CursorPaginationMeta {
-  limit: number;
-  hasNextPage: boolean;
-  nextCursor?: string;
-}
-
-export interface CursorPaginatedResponse<T> {
-  success: boolean;
-  data: T[];
-  meta: CursorPaginationMeta;
 }
 
 export enum SortOrder {

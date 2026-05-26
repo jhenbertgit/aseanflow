@@ -23,6 +23,3 @@ export const PHILIPPINE_BANKS = [
   { code: "MAYBANK", name: "Maybank Philippines" },
   { code: "AUB", name: "Asia United Bank (AUB)" },
 ] as const;
-
-export type IndonesianBankCode = (typeof INDONESIAN_BANKS)[number]["code"];
-export type PhilippineBankCode = (typeof PHILIPPINE_BANKS)[number]["code"];

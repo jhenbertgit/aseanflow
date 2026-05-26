@@ -74,7 +74,7 @@ export function MintHistory({ rewards, totalCount, showAll, onToggle }: MintHist
                   {formatTime(reward.createdAt)}
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground">
+              <span className="truncate text-xs text-muted-foreground">
                 {reward.transferCode}
               </span>
             </div>
@@ -82,16 +82,16 @@ export function MintHistory({ rewards, totalCount, showAll, onToggle }: MintHist
               href={`${MORPH_EXPLORER}/tx/${reward.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 font-mono text-xs text-muted-foreground hover:underline"
+              className="shrink-0 rounded px-1.5 py-1 font-mono text-xs text-muted-foreground hover:underline active:bg-muted min-h-[44px] flex items-center"
             >
-              {reward.txHash.slice(0, 10)}...
+              {reward.txHash.slice(0, 8)}...
             </a>
           </div>
         ))}
         {totalCount != null && totalCount > 3 && onToggle && (
           <button
             onClick={onToggle}
-            className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+            className="rounded px-2 py-2 text-xs text-muted-foreground hover:text-foreground hover:underline active:bg-muted min-h-[44px]"
           >
             {showAll ? "Show less" : `Show all (${totalCount})`}
           </button>

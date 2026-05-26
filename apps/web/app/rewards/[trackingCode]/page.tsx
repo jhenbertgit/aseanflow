@@ -33,7 +33,7 @@ export default function RewardsPage({
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md sm:max-w-lg"
       >
         <Button asChild variant="ghost" size="sm">
           <Link href="/dashboard">← Back</Link>
@@ -44,19 +44,19 @@ export default function RewardsPage({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md sm:max-w-lg"
       >
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">AFT Rewards</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">AFT Rewards</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && <LoadingState size="sm" />}
             {notFound && (
-              <div className="flex flex-col items-center gap-4 py-6 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
                   <svg
-                    className="h-6 w-6 text-destructive"
+                    className="h-7 w-7 text-destructive"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -69,16 +69,16 @@ export default function RewardsPage({
                     />
                   </svg>
                 </div>
-                <div className="space-y-1">
+                <div className="max-w-[280px] space-y-1.5">
                   <p className="text-sm font-medium text-destructive">
                     Transfer not found
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     No transfer exists with code &ldquo;{trackingCode}&rdquo;.
                     Make sure you copied it correctly.
                   </p>
                 </div>
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="mt-1 min-h-[44px]">
                   <Link href="/">Try a different code</Link>
                 </Button>
               </div>
