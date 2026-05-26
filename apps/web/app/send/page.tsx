@@ -29,7 +29,8 @@ function getOrCreateCookie(): string {
   }
 
   const token = crypto.randomUUID();
-  document.cookie = `${SESSION_COOKIE}=${token};path=/;max-age=${60 * 60 * 24 * 365}`;
+  const secure = window.location.protocol === "https:" ? ";Secure" : "";
+  document.cookie = `${SESSION_COOKIE}=${token};path=/;max-age=${60 * 60 * 24 * 365};SameSite=Lax${secure}`;
   return token;
 }
 
@@ -41,8 +42,9 @@ export default function SendPage() {
 
     initUser(token)
       .then(() => setCookieToken(token))
-      .catch(() => {
-        // Init might fail if user already exists — try dashboard load anyway
+      .catch((err) => {
+        console.error("User init failed:", err);
+        // User might already exist from previous session — try dashboard load
         setCookieToken(token);
       });
   }, []);
