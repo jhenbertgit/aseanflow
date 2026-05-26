@@ -76,7 +76,7 @@ export default function SendPage() {
       <BalanceCards wallets={dashboard.wallets} />
 
       {/* Quick send + Recent Activity side-by-side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

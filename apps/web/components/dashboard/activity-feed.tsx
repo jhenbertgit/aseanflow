@@ -40,7 +40,7 @@ export function ActivityFeed({ transfers }: ActivityFeedProps) {
   const recent = transfers.slice(0, 5);
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Recent Activity</CardTitle>
       </CardHeader>
