@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /app
 
@@ -40,7 +40,7 @@ COPY turbo.json ./
 
 RUN pnpm --filter @aseanflow/web build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 

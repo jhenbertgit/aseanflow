@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /app
 
@@ -41,7 +41,7 @@ RUN pnpm --filter @aseanflow/api build
 
 RUN pnpm deploy --prod --legacy --filter @aseanflow/api /app/deploy
 
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 COPY --from=build /app/deploy .
 
