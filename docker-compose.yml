@@ -70,6 +70,19 @@ services:
     networks:
       - aseanflow
 
+  seed:
+    build:
+      context: .
+      dockerfile: packages/database/Dockerfile.seeder
+    container_name: aseanflow-seed
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-aseanflow}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aseanflow
+
   api:
     build:
       context: .
