@@ -86,7 +86,7 @@ export class SettlementService {
     });
 
     // Update wallet balances and create ledger entries
-    if (settledTransfer?.senderId) {
+    if (settledTransfer) {
       await this.updateWalletBalances(settledTransfer);
     }
 
@@ -102,7 +102,7 @@ export class SettlementService {
 
   private async updateWalletBalances(transfer: {
     id: string;
-    senderId: string;
+    senderId: string | null;
     sourceCurrency: 'PHP' | 'IDR';
     targetCurrency: 'PHP' | 'IDR';
     recipientType: 'WALLET' | 'BANK';
@@ -111,40 +111,39 @@ export class SettlementService {
     receiveAmount: Prisma.Decimal;
     fee: Prisma.Decimal;
   }) {
-    const senderId = transfer.senderId;
-    const totalDebit = transfer.sendAmount.plus(transfer.fee);
-
     await this.prisma.$transaction(async (tx) => {
       // 1. Debit sender's source wallet
-      const sourceWallet = await tx.accountWallet.findUnique({
-        where: {
-          userId_currency: {
-            userId: senderId,
+      if (transfer.senderId) {
+        const totalDebit = transfer.sendAmount.plus(transfer.fee);
+
+        const sourceWallet = await tx.accountWallet.findUnique({
+          where: {
+            userId_currency: {
+              userId: transfer.senderId,
+              currency: transfer.sourceCurrency,
+            },
+          },
+        });
+
+        if (sourceWallet) {
+          await tx.accountWallet.update({
+            where: { id: sourceWallet.id },
+            data: { balance: { decrement: totalDebit } },
+          });
+        }
+
+        await tx.ledgerEntry.create({
+          data: {
+            transferId: transfer.id,
+            debit: totalDebit,
+            credit: new Prisma.Decimal(0),
             currency: transfer.sourceCurrency,
           },
-        },
-      });
-
-      if (sourceWallet) {
-        await tx.accountWallet.update({
-          where: { id: sourceWallet.id },
-          data: { balance: { decrement: totalDebit } },
         });
       }
 
-      // Debit ledger entry for sender
-      await tx.ledgerEntry.create({
-        data: {
-          transferId: transfer.id,
-          debit: totalDebit,
-          credit: new Prisma.Decimal(0),
-          currency: transfer.sourceCurrency,
-        },
-      });
-
       // 2. Credit recipient by account number (WALLET type)
       if (transfer.recipientType === 'WALLET' && transfer.recipientWalletId) {
-        // recipientWalletId stores the account number (e.g. "AF0000000001")
         const recipientUser = await tx.user.findUnique({
           where: { accountNumber: transfer.recipientWalletId },
         });

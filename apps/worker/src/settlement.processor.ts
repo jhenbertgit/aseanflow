@@ -92,15 +92,15 @@ export function createSettlementProcessor(prisma: PrismaClient) {
     job.log("Advanced to SETTLED");
 
     // Update wallet balances after settlement
-    if (transfer.senderId) {
-      const totalDebit = transfer.sendAmount.plus(transfer.fee);
+    await prisma.$transaction(async (tx) => {
+      // 1. Debit sender's source wallet
+      if (transfer.senderId) {
+        const totalDebit = transfer.sendAmount.plus(transfer.fee);
 
-      await prisma.$transaction(async (tx) => {
-        // 1. Debit sender's source wallet
         const sourceWallet = await tx.accountWallet.findUnique({
           where: {
             userId_currency: {
-              userId: transfer.senderId!,
+              userId: transfer.senderId,
               currency: transfer.sourceCurrency,
             },
           },
@@ -113,7 +113,6 @@ export function createSettlementProcessor(prisma: PrismaClient) {
           });
         }
 
-        // Debit ledger entry for sender
         await tx.ledgerEntry.create({
           data: {
             transferId: id,
@@ -122,45 +121,44 @@ export function createSettlementProcessor(prisma: PrismaClient) {
             currency: transfer.sourceCurrency,
           },
         });
+      }
 
-        // 2. Credit recipient by account number (WALLET type)
-        if (transfer.recipientType === "WALLET" && transfer.recipientWalletId) {
-          // recipientWalletId stores the account number (e.g. "AF0000000001")
-          const recipientUser = await tx.user.findUnique({
-            where: { accountNumber: transfer.recipientWalletId },
-          });
+      // 2. Credit recipient by account number (WALLET type)
+      if (transfer.recipientType === "WALLET" && transfer.recipientWalletId) {
+        const recipientUser = await tx.user.findUnique({
+          where: { accountNumber: transfer.recipientWalletId },
+        });
 
-          if (recipientUser) {
-            await tx.accountWallet.upsert({
-              where: {
-                userId_currency: {
-                  userId: recipientUser.id,
-                  currency: transfer.targetCurrency,
-                },
-              },
-              update: { balance: { increment: transfer.receiveAmount } },
-              create: {
+        if (recipientUser) {
+          await tx.accountWallet.upsert({
+            where: {
+              userId_currency: {
                 userId: recipientUser.id,
                 currency: transfer.targetCurrency,
-                balance: transfer.receiveAmount,
               },
-            });
+            },
+            update: { balance: { increment: transfer.receiveAmount } },
+            create: {
+              userId: recipientUser.id,
+              currency: transfer.targetCurrency,
+              balance: transfer.receiveAmount,
+            },
+          });
 
-            await tx.ledgerEntry.create({
-              data: {
-                transferId: id,
-                debit: new Prisma.Decimal(0),
-                credit: transfer.receiveAmount,
-                currency: transfer.targetCurrency,
-              },
-            });
-          }
+          await tx.ledgerEntry.create({
+            data: {
+              transferId: id,
+              debit: new Prisma.Decimal(0),
+              credit: transfer.receiveAmount,
+              currency: transfer.targetCurrency,
+            },
+          });
         }
-        // BANK transfers: money leaves the system, no credit to any user
-      });
+      }
+      // BANK transfers: money leaves the system, no credit to any user
+    });
 
-      job.log("Updated wallet balances and created ledger entries");
-    }
+    job.log("Updated wallet balances and created ledger entries");
 
     return { transferId: id, status: "SETTLED" };
   };
