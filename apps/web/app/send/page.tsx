@@ -10,29 +10,41 @@ import { QuickSend } from "@/components/dashboard/quick-send";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { TransferHistory } from "@/components/dashboard/transfer-history";
 import { useDashboard } from "@/lib/api/hooks";
+import { initUser } from "@/lib/api/user";
 
-const DEMO_COOKIE = "af_session";
-const DEMO_TOKEN = "af_demo_session_token_2026";
+const SESSION_COOKIE = "af_session";
+
+function getOrCreateCookie(): string {
+  const cookies = document.cookie.split(";").reduce(
+    (acc, c) => {
+      const [k, v] = c.trim().split("=");
+      acc[k] = v;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  if (cookies[SESSION_COOKIE]) {
+    return cookies[SESSION_COOKIE];
+  }
+
+  const token = crypto.randomUUID();
+  document.cookie = `${SESSION_COOKIE}=${token};path=/;max-age=${60 * 60 * 24 * 365}`;
+  return token;
+}
 
 export default function SendPage() {
   const [cookieToken, setCookieToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const cookies = document.cookie.split(";").reduce(
-      (acc, c) => {
-        const [k, v] = c.trim().split("=");
-        acc[k] = v;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
+    const token = getOrCreateCookie();
 
-    if (cookies[DEMO_COOKIE]) {
-      setCookieToken(cookies[DEMO_COOKIE]);
-    } else {
-      document.cookie = `${DEMO_COOKIE}=${DEMO_TOKEN};path=/;max-age=${60 * 60 * 24 * 365}`;
-      setCookieToken(DEMO_TOKEN);
-    }
+    initUser(token)
+      .then(() => setCookieToken(token))
+      .catch(() => {
+        // Init might fail if user already exists — try dashboard load anyway
+        setCookieToken(token);
+      });
   }, []);
 
   const { data: dashboard, isLoading, error } = useDashboard(cookieToken);
@@ -51,7 +63,10 @@ export default function SendPage() {
         <div className="text-center">
           <p className="text-destructive mb-2">Failed to load dashboard</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              document.cookie = `${SESSION_COOKIE}=;path=/;max-age=0`;
+              window.location.reload();
+            }}
             className="text-sm text-primary underline"
           >
             Retry
@@ -69,7 +84,7 @@ export default function SendPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <UserHeader name={dashboard.user.name} />
+        <UserHeader name={dashboard.user.name} aftWalletAddress={dashboard.aftWalletAddress} />
       </motion.div>
 
       {/* Balance cards */}
