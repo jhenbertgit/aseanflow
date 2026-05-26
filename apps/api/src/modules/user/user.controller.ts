@@ -1,4 +1,4 @@
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UserService } from './user.service';
 
@@ -15,5 +15,11 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
     return dashboard;
+  }
+
+  @Post('users/init')
+  @ApiOperation({ summary: 'Initialize new user with cookie token' })
+  async initUser(@Body() body: { cookieToken: string }) {
+    return this.userService.initUser(body.cookieToken);
   }
 }
