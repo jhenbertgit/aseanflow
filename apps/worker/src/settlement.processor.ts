@@ -1,5 +1,9 @@
 import type { Job } from "bullmq";
-import type { PrismaClient, TransferStatus } from "@aseanflow/database";
+import {
+  type PrismaClient,
+  type TransferStatus,
+  Prisma,
+} from "@aseanflow/database";
 
 const STATUS_ORDER: TransferStatus[] = [
   "CREATED",
@@ -86,6 +90,77 @@ export function createSettlementProcessor(prisma: PrismaClient) {
 
     await advanceStatus(id, "SETTLED");
     job.log("Advanced to SETTLED");
+
+    // Update wallet balances after settlement
+    if (transfer.senderId) {
+      const totalDebit = transfer.sendAmount.plus(transfer.fee);
+
+      await prisma.$transaction(async (tx) => {
+        // 1. Debit sender's source wallet
+        const sourceWallet = await tx.accountWallet.findUnique({
+          where: {
+            userId_currency: {
+              userId: transfer.senderId!,
+              currency: transfer.sourceCurrency,
+            },
+          },
+        });
+
+        if (sourceWallet) {
+          await tx.accountWallet.update({
+            where: { id: sourceWallet.id },
+            data: { balance: { decrement: totalDebit } },
+          });
+        }
+
+        // Debit ledger entry for sender
+        await tx.ledgerEntry.create({
+          data: {
+            transferId: id,
+            debit: totalDebit,
+            credit: new Prisma.Decimal(0),
+            currency: transfer.sourceCurrency,
+          },
+        });
+
+        // 2. Credit recipient by account number (WALLET type)
+        if (transfer.recipientType === "WALLET" && transfer.recipientWalletId) {
+          // recipientWalletId stores the account number (e.g. "AF0000000001")
+          const recipientUser = await tx.user.findUnique({
+            where: { accountNumber: transfer.recipientWalletId },
+          });
+
+          if (recipientUser) {
+            await tx.accountWallet.upsert({
+              where: {
+                userId_currency: {
+                  userId: recipientUser.id,
+                  currency: transfer.targetCurrency,
+                },
+              },
+              update: { balance: { increment: transfer.receiveAmount } },
+              create: {
+                userId: recipientUser.id,
+                currency: transfer.targetCurrency,
+                balance: transfer.receiveAmount,
+              },
+            });
+
+            await tx.ledgerEntry.create({
+              data: {
+                transferId: id,
+                debit: new Prisma.Decimal(0),
+                credit: transfer.receiveAmount,
+                currency: transfer.targetCurrency,
+              },
+            });
+          }
+        }
+        // BANK transfers: money leaves the system, no credit to any user
+      });
+
+      job.log("Updated wallet balances and created ledger entries");
+    }
 
     return { transferId: id, status: "SETTLED" };
   };

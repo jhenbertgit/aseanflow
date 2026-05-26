@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Body, Param, Query, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
+  Inject,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Queue } from 'bullmq';
 import { TransferService } from './transfer.service';

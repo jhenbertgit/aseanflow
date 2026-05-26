@@ -30,13 +30,14 @@ type RecipientMode = "WALLET" | "BANK";
 
 interface QuickSendProps {
   userId?: string;
+  lastTrackingCode?: string;
 }
 
-export function QuickSend({ userId }: QuickSendProps) {
+export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
   const [amount, setAmount] = useState<number>(1000);
   const [direction, setDirection] = useState<Direction>("PHP_TO_IDR");
   const [recipientMode, setRecipientMode] = useState<RecipientMode>("WALLET");
-  const [recipientWalletId, setRecipientWalletId] = useState("");
+  const [recipientAccountNumber, setRecipientAccountNumber] = useState("AF0000000000");
   const [recipientName, setRecipientName] = useState("");
   const [recipientBank, setRecipientBank] = useState("");
   const [recipientAccount, setRecipientAccount] = useState("");
@@ -50,10 +51,10 @@ export function QuickSend({ userId }: QuickSendProps) {
   const { data: quote, isLoading } = useQuote(amount, from, to);
   const createTransfer = useCreateTransfer();
 
-  const isAmountValid = amount >= 1 && amount <= 1_000_000;
+  const isAmountValid = amount >= 1 && amount <= 1_000_000_000;
   const isSubmitting = createTransfer.isPending;
 
-  const isWalletRecipientValid = recipientWalletId.trim().length > 0;
+  const isWalletRecipientValid = recipientAccountNumber.trim().length > 0;
   const isBankRecipientValid =
     recipientName.trim().length >= 2 &&
     recipientBank.length > 0 &&
@@ -73,9 +74,10 @@ export function QuickSend({ userId }: QuickSendProps) {
       from,
       to,
       senderId: userId,
+      trackingCode: lastTrackingCode || undefined,
       recipientType: recipientMode,
       ...(recipientMode === "WALLET"
-        ? { recipientWalletId: recipientWalletId.trim() }
+        ? { recipientWalletId: recipientAccountNumber.trim() }
         : {
             recipientName: recipientName.trim(),
             recipientBank,
@@ -108,13 +110,18 @@ export function QuickSend({ userId }: QuickSendProps) {
             <Input
               type="number"
               min={1}
-              max={1_000_000}
+              max={1_000_000_000}
               value={amount || ""}
               onChange={(e) => setAmount(Number(e.target.value) || 0)}
-              className="pl-8"
+              className={`pl-8 ${amount > 1_000_000_000 ? "border-destructive focus-visible:ring-destructive" : ""}`}
               placeholder="Amount"
             />
           </div>
+          {amount > 1_000_000_000 && (
+            <p className="text-xs text-destructive">
+              Max amount is {sourceSymbol}1,000,000,000
+            </p>
+          )}
           <div className="flex items-center text-muted-foreground text-sm">
             → {to}
           </div>
@@ -174,9 +181,9 @@ export function QuickSend({ userId }: QuickSendProps) {
               exit={{ opacity: 0 }}
             >
               <Input
-                value={recipientWalletId}
-                onChange={(e) => setRecipientWalletId(e.target.value.trim())}
-                placeholder="Wallet ID"
+                value={recipientAccountNumber}
+                onChange={(e) => setRecipientAccountNumber(e.target.value.trim())}
+                placeholder="Account Number (e.g. AF0000000001)"
               />
             </motion.div>
           ) : (
@@ -230,7 +237,9 @@ export function QuickSend({ userId }: QuickSendProps) {
 
         {createTransfer.error && (
           <p className="text-xs text-destructive text-center">
-            Transfer failed. Try again.
+            {createTransfer.error instanceof Error && createTransfer.error.message.includes("not found")
+              ? createTransfer.error.message
+              : "Transfer failed. Try again."}
           </p>
         )}
       </CardContent>

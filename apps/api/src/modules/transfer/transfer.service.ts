@@ -80,6 +80,18 @@ export class TransferService {
       dto.trackingCode,
     );
 
+    // Validate recipient account number for WALLET transfers
+    if (dto.recipientType === 'WALLET' && dto.recipientWalletId) {
+      const recipient = await this.prisma.user.findUnique({
+        where: { accountNumber: dto.recipientWalletId },
+      });
+      if (!recipient) {
+        throw new BadRequestException(
+          `Recipient account ${dto.recipientWalletId} not found`,
+        );
+      }
+    }
+
     const trackingCode = this.generateTrackingCode();
 
     const transfer = await this.prisma.transfer.create({

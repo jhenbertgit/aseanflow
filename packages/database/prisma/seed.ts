@@ -1,7 +1,27 @@
+import { createPrismaClient } from "../src/index.js";
+
 async function main() {
-  console.log("Seeding database...");
-  console.log("No seed data required — users auto-created on first dashboard visit.");
-  console.log("Seed complete.");
+  const prisma = createPrismaClient();
+
+  const user = await prisma.user.upsert({
+    where: { accountNumber: "AF0000000000" },
+    update: {},
+    create: {
+      accountNumber: "AF0000000000",
+      name: "Default User",
+      email: "default@aseanflow.test",
+      cookieToken: "seed-default-token",
+      wallets: {
+        create: [
+          { currency: "PHP", balance: "100000.00" },
+          { currency: "IDR", balance: "0.00" },
+        ],
+      },
+    },
+  });
+
+  console.log("Seeded default user:", user.accountNumber);
+  await prisma.$disconnect();
 }
 
 main().catch((e) => {

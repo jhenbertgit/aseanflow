@@ -7,7 +7,7 @@ import { Button } from "@aseanflow/ui/components/button";
 import { LayoutDashboard, Layout, Menu, X } from "lucide-react";
 
 const navItems = [
-  { name: "Dashboard", href: "/send", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Architecture", href: "/architecture", icon: Layout },
 ];
 

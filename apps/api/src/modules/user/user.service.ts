@@ -87,7 +87,10 @@ export class UserService {
           }
           const accountNumber = `AF${String(nextNum).padStart(10, '0')}`;
 
-          const randomTag = Math.random().toString(36).substring(2, 8).toUpperCase();
+          const randomTag = Math.random()
+            .toString(36)
+            .substring(2, 8)
+            .toUpperCase();
 
           return tx.user.create({
             data: {
@@ -97,8 +100,14 @@ export class UserService {
               cookieToken,
               wallets: {
                 create: [
-                  { currency: 'PHP', balance: new Prisma.Decimal('1000000.00') },
-                  { currency: 'IDR', balance: new Prisma.Decimal('10000000.00') },
+                  {
+                    currency: 'PHP',
+                    balance: new Prisma.Decimal('1000000.00'),
+                  },
+                  {
+                    currency: 'IDR',
+                    balance: new Prisma.Decimal('10000000.00'),
+                  },
                 ],
               },
             },

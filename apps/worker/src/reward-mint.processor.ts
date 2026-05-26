@@ -47,10 +47,10 @@ export function createRewardMintProcessor(prisma: PrismaClient) {
 
     const transfer = await prisma.transfer.findUnique({
       where: { id: transferId },
-      include: { wallet: true },
+      include: { rewardWallet: true },
     });
 
-    if (!transfer?.wallet) {
+    if (!transfer?.rewardWallet) {
       job.log(`No wallet for transfer ${transferId} — skipping`);
       return { transferId, status: "SKIPPED" };
     }
@@ -65,7 +65,7 @@ export function createRewardMintProcessor(prisma: PrismaClient) {
     if (tokenContract) {
       const result = await enqueueTx(async () => {
         const tx = await tokenContract!.mint(
-          transfer.wallet!.address,
+          transfer.rewardWallet!.address,
           REWARD_AMOUNT,
         );
         job.log(`Mint tx submitted: ${tx.hash}`);

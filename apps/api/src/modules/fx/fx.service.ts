@@ -14,6 +14,7 @@ interface LiveResponse {
 export class FxService {
   private readonly FALLBACK_RATE = 289.2;
   private readonly CACHE_TTL = 30;
+  private readonly FALLBACK_CACHE_TTL = 60;
   private readonly logger = new Logger(FxService.name);
 
   constructor(
@@ -27,17 +28,21 @@ export class FxService {
     const cached = await this.redis.get(cacheKey);
     if (cached) return parseFloat(cached);
 
-    const rate = await this.fetchLiveRate(from, to);
-    await this.redis.setEx(cacheKey, this.CACHE_TTL, rate.toString());
+    const { rate, isFallback } = await this.fetchLiveRate(from, to);
+    const ttl = isFallback ? this.FALLBACK_CACHE_TTL : this.CACHE_TTL;
+    await this.redis.setEx(cacheKey, ttl, rate.toString());
     return rate;
   }
 
-  private async fetchLiveRate(from: string, to: string): Promise<number> {
+  private async fetchLiveRate(
+    from: string,
+    to: string,
+  ): Promise<{ rate: number; isFallback: boolean }> {
     const apiKey = this.configService.get<string>('APILAYER_API_KEY');
 
     if (!apiKey) {
       this.logger.warn('APILAYER_API_KEY not set — using fallback rate');
-      return this.FALLBACK_RATE;
+      return { rate: this.FALLBACK_RATE, isFallback: true };
     }
 
     try {
@@ -48,9 +53,9 @@ export class FxService {
 
       if (!res.ok) {
         this.logger.warn(
-          `APILayer returned ${res.status} — using fallback rate`,
+          `APILayer returned ${res.status} — using fallback rate (cached ${this.FALLBACK_CACHE_TTL}s)`,
         );
-        return this.FALLBACK_RATE;
+        return { rate: this.FALLBACK_RATE, isFallback: true };
       }
 
       const data = (await res.json()) as LiveResponse;
@@ -59,14 +64,14 @@ export class FxService {
         this.logger.warn(
           'APILayer response unsuccessful — using fallback rate',
         );
-        return this.FALLBACK_RATE;
+        return { rate: this.FALLBACK_RATE, isFallback: true };
       }
 
       const pair = `${from}${to}`;
       const directRate = data.quotes[pair];
       if (directRate && directRate > 0) {
         this.logger.log(`Live ${pair} rate: ${directRate}`);
-        return directRate;
+        return { rate: directRate, isFallback: false };
       }
 
       // API returns USD-based quotes — cross-calculate if direct pair absent
@@ -77,16 +82,16 @@ export class FxService {
         this.logger.log(
           `Cross-calculated ${pair} rate: ${crossRate} (USD${to}=${usdTo} / USD${from}=${usdFrom})`,
         );
-        return crossRate;
+        return { rate: crossRate, isFallback: false };
       }
 
       this.logger.warn(`No rate data for ${pair} — using fallback rate`);
-      return this.FALLBACK_RATE;
+      return { rate: this.FALLBACK_RATE, isFallback: true };
     } catch (error) {
       this.logger.warn(
         `APILayer fetch failed: ${error instanceof Error ? error.message : String(error)} — using fallback rate`,
       );
-      return this.FALLBACK_RATE;
+      return { rate: this.FALLBACK_RATE, isFallback: true };
     }
   }
 

@@ -6,6 +6,7 @@ import { InstapaySimulator } from './instapay.simulator';
 import { BifastSimulator } from './bifast.simulator';
 import { PrismaService } from '../../common/services/prisma.service';
 import { TransferEvents } from '../../events/transfer.events';
+import { Prisma } from '@aseanflow/database';
 
 @Injectable()
 export class SettlementService {
@@ -16,6 +17,7 @@ export class SettlementService {
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
     @Inject('MORPH_QUEUE') private readonly morphQueue: Queue,
+    @Inject('REWARD_MINT_QUEUE') private readonly rewardQueue: Queue,
   ) {}
 
   async orchestrate(transferId: string): Promise<void> {
@@ -83,6 +85,11 @@ export class SettlementService {
       where: { id: transferId },
     });
 
+    // Update wallet balances and create ledger entries
+    if (settledTransfer?.senderId) {
+      await this.updateWalletBalances(settledTransfer);
+    }
+
     this.eventEmitter.emit(TransferEvents.SETTLED, {
       transferId,
       trackingCode: settledTransfer?.trackingCode ?? transferId,
@@ -90,5 +97,85 @@ export class SettlementService {
     });
 
     await this.morphQueue.add('anchor', { transferId });
+    await this.rewardQueue.add('mint', { transferId });
+  }
+
+  private async updateWalletBalances(transfer: {
+    id: string;
+    senderId: string;
+    sourceCurrency: 'PHP' | 'IDR';
+    targetCurrency: 'PHP' | 'IDR';
+    recipientType: 'WALLET' | 'BANK';
+    recipientWalletId: string | null;
+    sendAmount: Prisma.Decimal;
+    receiveAmount: Prisma.Decimal;
+    fee: Prisma.Decimal;
+  }) {
+    const senderId = transfer.senderId;
+    const totalDebit = transfer.sendAmount.plus(transfer.fee);
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Debit sender's source wallet
+      const sourceWallet = await tx.accountWallet.findUnique({
+        where: {
+          userId_currency: {
+            userId: senderId,
+            currency: transfer.sourceCurrency,
+          },
+        },
+      });
+
+      if (sourceWallet) {
+        await tx.accountWallet.update({
+          where: { id: sourceWallet.id },
+          data: { balance: { decrement: totalDebit } },
+        });
+      }
+
+      // Debit ledger entry for sender
+      await tx.ledgerEntry.create({
+        data: {
+          transferId: transfer.id,
+          debit: totalDebit,
+          credit: new Prisma.Decimal(0),
+          currency: transfer.sourceCurrency,
+        },
+      });
+
+      // 2. Credit recipient by account number (WALLET type)
+      if (transfer.recipientType === 'WALLET' && transfer.recipientWalletId) {
+        // recipientWalletId stores the account number (e.g. "AF0000000001")
+        const recipientUser = await tx.user.findUnique({
+          where: { accountNumber: transfer.recipientWalletId },
+        });
+
+        if (recipientUser) {
+          await tx.accountWallet.upsert({
+            where: {
+              userId_currency: {
+                userId: recipientUser.id,
+                currency: transfer.targetCurrency,
+              },
+            },
+            update: { balance: { increment: transfer.receiveAmount } },
+            create: {
+              userId: recipientUser.id,
+              currency: transfer.targetCurrency,
+              balance: transfer.receiveAmount,
+            },
+          });
+
+          await tx.ledgerEntry.create({
+            data: {
+              transferId: transfer.id,
+              debit: new Prisma.Decimal(0),
+              credit: transfer.receiveAmount,
+              currency: transfer.targetCurrency,
+            },
+          });
+        }
+      }
+      // BANK transfers: money leaves the system, no credit to any user
+    });
   }
 }

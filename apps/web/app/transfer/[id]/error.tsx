@@ -21,7 +21,7 @@ export default function TransferError({
           Try again
         </Button>
         <Button asChild variant="ghost" size="sm">
-          <Link href="/send">Back to send</Link>
+          <Link href="/dashboard">Back to dashboard</Link>
         </Button>
       </div>
     </main>

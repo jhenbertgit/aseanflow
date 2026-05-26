@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Copy, Check } from "lucide-react";
+import { Copy, Check, ExternalLink } from "lucide-react";
 import type { AccountWalletResponse } from "@aseanflow/shared";
 
 const CURRENCY_CONFIG: Record<
@@ -45,51 +46,15 @@ function formatBalance(amount: string, currency: string): string {
   }).format(num);
 }
 
-function MaskedId({ id }: { id: string }) {
-  const [visible, setVisible] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }, [id]);
-
-  return (
-    <div className="flex items-center gap-1">
-      <span className="font-mono text-[10px] text-muted-foreground/70 truncate max-w-[100px]">
-        {visible ? id : "••••••••"}
-      </span>
-      <button
-        onClick={() => setVisible(!visible)}
-        className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-        aria-label={visible ? "Hide wallet ID" : "Show wallet ID"}
-      >
-        {visible ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-      </button>
-      <button
-        onClick={handleCopy}
-        className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-        aria-label="Copy wallet ID"
-      >
-        {copied ? (
-          <Check className="h-3 w-3 text-emerald-500" />
-        ) : (
-          <Copy className="h-3 w-3" />
-        )}
-      </button>
-    </div>
-  );
-}
-
 interface BalanceCardsProps {
   wallets: AccountWalletResponse[];
   aftBalance: string;
   aftWalletAddress: string | null;
   accountNumber: string;
+  latestTrackingCode?: string;
 }
 
-export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNumber }: BalanceCardsProps) {
+export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNumber, latestTrackingCode }: BalanceCardsProps) {
   const allBalances = [
     ...wallets,
     { id: aftWalletAddress ?? "aft", currency: "AFT", balance: aftBalance },
@@ -135,8 +100,16 @@ export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNum
                 <p className="text-xs text-muted-foreground">
                   {wallet.currency} Balance
                 </p>
+                {wallet.currency === "AFT" && latestTrackingCode && (
+                  <Link
+                    href={`/rewards/${latestTrackingCode}`}
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-500 hover:text-purple-400 transition-colors"
+                  >
+                    Show Details
+                    <ExternalLink className="h-2.5 w-2.5" />
+                  </Link>
+                )}
               </div>
-              <MaskedId id={wallet.id} />
               <p className={`text-xl font-bold ${config?.accent ?? ""} mt-2`}>
                 {config?.symbol}
                 {formatBalance(wallet.balance, wallet.currency)}

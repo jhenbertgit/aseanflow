@@ -36,7 +36,7 @@ export default function RewardsPage({
         className="w-full max-w-md"
       >
         <Button asChild variant="ghost" size="sm">
-          <Link href="/">← Back</Link>
+          <Link href="/dashboard">← Back</Link>
         </Button>
       </motion.div>
 

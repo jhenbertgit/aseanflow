@@ -57,6 +57,7 @@ coverage/
 
 # Superpowers
 .superpowers/
+docs/superpowers/
 
 # Apps
 apps/api/dist

@@ -23,7 +23,7 @@ export function CtaSection() {
           size="lg"
           className="bg-[var(--accent-emerald)] px-8 text-white hover:bg-[var(--accent-emerald-dark)]"
         >
-          <Link href="/send">Open Dashboard</Link>
+          <Link href="/dashboard">Open Dashboard</Link>
         </Button>
         <p className="text-sm text-[var(--accent-gold)]">
           Earn AFT on every transfer ⭐

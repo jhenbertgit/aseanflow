@@ -41,7 +41,7 @@ export function useQuote(
         to,
         debouncedTrackingCode || undefined,
       ),
-    enabled: debouncedAmount > 0 && debouncedAmount <= 1_000_000,
+    enabled: debouncedAmount > 0 && debouncedAmount <= 1_000_000_000,
     staleTime: 10_000,
   });
 }

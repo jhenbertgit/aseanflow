@@ -40,7 +40,7 @@ export default function TransferPage({
         className="w-full max-w-md"
       >
         <Button asChild variant="ghost" size="sm">
-          <Link href="/send">← Back</Link>
+          <Link href="/dashboard">← Back</Link>
         </Button>
       </motion.div>
 
