@@ -66,7 +66,7 @@ describe('FxService', () => {
       const result = await service.getRate('PHP', 'IDR');
 
       expect(result).toBe(289.2);
-      expect(redisSetEx).toHaveBeenCalledWith('fx:PHP:IDR', 30, '289.2');
+      expect(redisSetEx).toHaveBeenCalledWith('fx:PHP:IDR', 60, '289.2');
     });
   });
 

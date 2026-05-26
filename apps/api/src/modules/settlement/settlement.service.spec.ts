@@ -60,6 +60,7 @@ describe('SettlementService', () => {
   let prisma: { transfer: { update: jest.Mock; findUnique: jest.Mock } };
   let eventEmitter: { emit: jest.Mock };
   let morphQueue: { add: jest.Mock };
+  let rewardQueue: { add: jest.Mock };
 
   beforeEach(async () => {
     transferService = { advanceStatus: jest.fn().mockResolvedValue({}) };
@@ -88,6 +89,7 @@ describe('SettlementService', () => {
     };
     eventEmitter = { emit: jest.fn() };
     morphQueue = { add: jest.fn().mockResolvedValue({}) };
+    rewardQueue = { add: jest.fn().mockResolvedValue({}) };
 
     const module = await Test.createTestingModule({
       providers: [
@@ -98,6 +100,7 @@ describe('SettlementService', () => {
         { provide: PrismaService, useValue: prisma },
         { provide: EventEmitter2, useValue: eventEmitter },
         { provide: 'MORPH_QUEUE', useValue: morphQueue },
+        { provide: 'REWARD_MINT_QUEUE', useValue: rewardQueue },
       ],
     }).compile();
 
@@ -156,6 +159,14 @@ describe('SettlementService', () => {
     await service.orchestrate('t1');
 
     expect(morphQueue.add).toHaveBeenCalledWith('anchor', {
+      transferId: 't1',
+    });
+  });
+
+  it('queues reward-mint job after SETTLED', async () => {
+    await service.orchestrate('t1');
+
+    expect(rewardQueue.add).toHaveBeenCalledWith('mint', {
       transferId: 't1',
     });
   });

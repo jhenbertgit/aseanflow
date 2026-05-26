@@ -50,6 +50,9 @@ describe('TransferService', () => {
     };
     prisma = {
       transfer: prismaTransferMock,
+      user: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'user-1', accountNumber: 'wallet-1' }),
+      },
       $transaction: jest.fn((cb) => cb({ transfer: prismaTransferMock })),
     };
     fxService = { calculateQuote: jest.fn() };
@@ -298,7 +301,7 @@ describe('TransferService', () => {
       expect(result.trackingCode).toBe('TXNABC123DEF');
       expect(prisma.transfer.findUnique).toHaveBeenCalledWith({
         where: { trackingCode: 'TXNABC123DEF' },
-        include: { ledgerEntries: true, wallet: true },
+        include: { ledgerEntries: true, rewardWallet: true },
       });
     });
 
