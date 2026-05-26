@@ -75,20 +75,32 @@ export default function SendPage() {
       {/* Balance cards */}
       <BalanceCards wallets={dashboard.wallets} />
 
-      {/* Quick send */}
+      {/* Quick send + Recent Activity side-by-side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+        >
+          <QuickSend userId={dashboard.user.id} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <ActivityFeed transfers={dashboard.recentTransfers} />
+        </motion.div>
+      </div>
+
+      {/* Transfer History full width */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.15 }}
+        transition={{ duration: 0.3, delay: 0.25 }}
       >
-        <QuickSend userId={dashboard.user.id} />
-      </motion.div>
-
-      {/* Activity + History grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ActivityFeed transfers={dashboard.recentTransfers} />
         <TransferHistory transfers={dashboard.recentTransfers} />
-      </div>
+      </motion.div>
     </main>
   );
 }
