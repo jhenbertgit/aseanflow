@@ -74,15 +74,15 @@ export class UserService {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const user = await this.prisma.$transaction(async (tx) => {
-          // FOR UPDATE lock prevents concurrent account number reads
-          const result = await tx.$queryRaw<Array<{ max: string | null }>>`
-            SELECT MAX("accountNumber") as max FROM "users" FOR UPDATE
-          `;
+          // Find highest account number — retry loop handles race conditions
+          const lastUser = await tx.user.findFirst({
+            orderBy: { accountNumber: 'desc' },
+            select: { accountNumber: true },
+          });
 
           let nextNum = 1;
-          const maxVal = result[0]?.max;
-          if (maxVal) {
-            const num = parseInt(maxVal.replace('AF', ''), 10);
+          if (lastUser?.accountNumber) {
+            const num = parseInt(lastUser.accountNumber.replace('AF', ''), 10);
             if (!isNaN(num)) nextNum = num + 1;
           }
           const accountNumber = `AF${String(nextNum).padStart(10, '0')}`;
