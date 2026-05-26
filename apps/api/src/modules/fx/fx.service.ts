@@ -49,6 +49,7 @@ export class FxService {
       const url = `https://api.apilayer.com/currency_data/live?base=${from}&symbols=${to}`;
       const res = await fetch(url, {
         headers: { apikey: apiKey },
+        signal: AbortSignal.timeout(30_000),
       });
 
       if (!res.ok) {
