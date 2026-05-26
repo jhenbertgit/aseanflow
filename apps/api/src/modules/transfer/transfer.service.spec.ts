@@ -35,6 +35,9 @@ describe('TransferService', () => {
       findUnique: jest.Mock;
       update: jest.Mock;
     };
+    user: {
+      findUnique: jest.Mock;
+    };
     $transaction: jest.Mock;
   };
   let fxService: { calculateQuote: jest.Mock };
