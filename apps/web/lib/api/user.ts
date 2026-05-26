@@ -12,3 +12,19 @@ export async function getDashboard(
 
   return res.json();
 }
+
+export async function initUser(
+  cookieToken: string,
+): Promise<{ id: string; accountNumber: string; name: string; email: string }> {
+  const res = await fetch(`/api/users/init`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cookieToken }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`User init failed: ${res.status}`);
+  }
+
+  return res.json();
+}
