@@ -9,6 +9,7 @@ async function seedDemoUser() {
     where: { email: "juan@aseanflow.demo" },
     update: {},
     create: {
+      accountNumber: "AF0000000001",
       name: "Juan Dela Cruz",
       email: "juan@aseanflow.demo",
       cookieToken: DEMO_COOKIE_TOKEN,
