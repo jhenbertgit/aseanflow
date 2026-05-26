@@ -73,7 +73,7 @@ export default function SendPage() {
       </motion.div>
 
       {/* Balance cards */}
-      <BalanceCards wallets={dashboard.wallets} />
+      <BalanceCards wallets={dashboard.wallets} aftBalance={dashboard.aftBalance} aftWalletAddress={dashboard.aftWalletAddress} accountNumber={dashboard.user.accountNumber} />
 
       {/* Quick send + Recent Activity side-by-side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
@@ -82,7 +82,10 @@ export default function SendPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
         >
-          <QuickSend userId={dashboard.user.id} />
+          <QuickSend
+            userId={dashboard.user.id}
+            lastTrackingCode={dashboard.recentTransfers[0]?.trackingCode}
+          />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
