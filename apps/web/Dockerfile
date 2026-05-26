@@ -1,4 +1,5 @@
 FROM node:22-alpine AS build
+RUN apk add --no-cache openssl libc6-compat
 RUN corepack enable
 WORKDIR /app
 
