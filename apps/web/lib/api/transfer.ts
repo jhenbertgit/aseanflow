@@ -14,6 +14,9 @@ export interface CreateTransferPayload {
   recipientName?: string;
   recipientBank?: string;
   recipientAccount?: string;
+  quoteRate?: number;
+  quoteFee?: number;
+  quoteReceiveAmount?: number;
 }
 
 export async function createTransfer(

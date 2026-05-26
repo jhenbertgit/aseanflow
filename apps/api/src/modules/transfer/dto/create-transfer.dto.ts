@@ -40,6 +40,30 @@ export class CreateTransferDto {
 
   @ApiProperty({
     required: false,
+    description: 'Pre-fetched quote rate from /api/quote',
+  })
+  @IsOptional()
+  @IsNumber()
+  quoteRate?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Pre-fetched quote fee from /api/quote',
+  })
+  @IsOptional()
+  @IsNumber()
+  quoteFee?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Pre-fetched receive amount from /api/quote',
+  })
+  @IsOptional()
+  @IsNumber()
+  quoteReceiveAmount?: number;
+
+  @ApiProperty({
+    required: false,
     description: 'Prior tracking code for returning users',
   })
   @IsOptional()

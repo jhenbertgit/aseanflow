@@ -76,6 +76,9 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
       senderId: userId,
       trackingCode: lastTrackingCode || undefined,
       recipientType: recipientMode,
+      quoteRate: quote.rate,
+      quoteFee: quote.fee,
+      quoteReceiveAmount: quote.receiveAmount,
       ...(recipientMode === "WALLET"
         ? { recipientWalletId: recipientAccountNumber.trim() }
         : {

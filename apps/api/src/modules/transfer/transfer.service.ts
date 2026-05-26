@@ -73,12 +73,29 @@ export class TransferService {
       walletId = wallet.id;
     }
 
-    const quote = await this.fxService.calculateQuote(
-      dto.amount,
-      dto.from,
-      dto.to,
-      dto.trackingCode,
-    );
+    let rate: number;
+    let fee: number;
+    let receiveAmount: number;
+
+    if (
+      dto.quoteRate != null &&
+      dto.quoteFee != null &&
+      dto.quoteReceiveAmount != null
+    ) {
+      rate = dto.quoteRate;
+      fee = dto.quoteFee;
+      receiveAmount = dto.quoteReceiveAmount;
+    } else {
+      const quote = await this.fxService.calculateQuote(
+        dto.amount,
+        dto.from,
+        dto.to,
+        dto.trackingCode,
+      );
+      rate = quote.rate;
+      fee = quote.fee;
+      receiveAmount = quote.receiveAmount;
+    }
 
     // Validate recipient account number for WALLET transfers
     if (dto.recipientType === 'WALLET' && dto.recipientWalletId) {
@@ -100,9 +117,9 @@ export class TransferService {
         sourceCurrency: dto.from as 'PHP' | 'IDR',
         targetCurrency: dto.to as 'PHP' | 'IDR',
         sendAmount: new Prisma.Decimal(dto.amount),
-        receiveAmount: new Prisma.Decimal(quote.receiveAmount),
-        exchangeRate: new Prisma.Decimal(quote.rate),
-        fee: new Prisma.Decimal(quote.fee),
+        receiveAmount: new Prisma.Decimal(receiveAmount),
+        exchangeRate: new Prisma.Decimal(rate),
+        fee: new Prisma.Decimal(fee),
         status: 'CREATED',
         walletId,
         recipientType: dto.recipientType as 'WALLET' | 'BANK',
