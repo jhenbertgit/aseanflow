@@ -36,27 +36,5 @@
   "packageManager": "pnpm@11.3.0+sha512.2c403d6594527287672b1f7056343a1f7c3634036a67ffabfcc2b3d7595d843768f8787148d1b57cf7956c90606bbd192857c363af19e96d2d0ec9ec5741d215",
   "engines": {
     "node": ">=22"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "@prisma/client",
-      "@prisma/engines",
-      "@tailwindcss/oxide",
-      "core-js-pure",
-      "esbuild",
-      "keccak",
-      "prisma",
-      "secp256k1",
-      "sharp",
-      "unrs-resolver"
-    ],
-    "overrides": {
-      "@types/react": "19.2.2",
-      "@types/react-dom": "19.2.2",
-      "validator": ">=13.15.20",
-      "tmp": ">=0.2.4",
-      "js-yaml": ">=4.1.1"
-    }
   }
 }
