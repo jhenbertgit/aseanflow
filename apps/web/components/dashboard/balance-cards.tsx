@@ -70,12 +70,12 @@ export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNum
 
   return (
     <>
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
         <span className="text-xs text-muted-foreground">Account Number</span>
         <span className="font-mono text-sm font-semibold">{accountNumber}</span>
         <button
           onClick={handleCopyAccount}
-          className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          className="p-1 -m-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           aria-label="Copy account number"
         >
           {copied ? (
@@ -85,7 +85,7 @@ export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNum
           )}
         </button>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         {allBalances.map((wallet, i) => {
           const config = CURRENCY_CONFIG[wallet.currency];
           return (
@@ -103,14 +103,14 @@ export function BalanceCards({ wallets, aftBalance, aftWalletAddress, accountNum
                 {wallet.currency === "AFT" && latestTrackingCode && (
                   <Link
                     href={`/rewards/${latestTrackingCode}`}
-                    className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-500 hover:text-purple-400 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-purple-500 hover:text-purple-400 transition-colors"
                   >
-                    Show Details
-                    <ExternalLink className="h-2.5 w-2.5" />
+                    Details
+                    <ExternalLink className="h-3 w-3" />
                   </Link>
                 )}
               </div>
-              <p className={`text-xl font-bold ${config?.accent ?? ""} mt-2`}>
+              <p className={`text-lg sm:text-xl font-bold ${config?.accent ?? ""} mt-2 break-all leading-tight`}>
                 {config?.symbol}
                 {formatBalance(wallet.balance, wallet.currency)}
               </p>

@@ -62,7 +62,7 @@ export function ActivityFeed({ transfers }: ActivityFeedProps) {
             >
               <Link
                 href={`/transfer/${t.trackingCode}`}
-                className="flex items-center gap-3 rounded-lg p-2 hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-3 rounded-lg p-3 sm:p-2 hover:bg-muted/50 transition-colors"
               >
                 <span className="text-lg">{config.icon}</span>
                 <div className="flex-1 min-w-0">

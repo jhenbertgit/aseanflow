@@ -102,29 +102,31 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-              {sourceSymbol}
-            </span>
-            <Input
-              type="number"
-              min={1}
-              max={1_000_000_000}
-              value={amount || ""}
-              onChange={(e) => setAmount(Number(e.target.value) || 0)}
-              className={`pl-8 ${amount > 1_000_000_000 ? "border-destructive focus-visible:ring-destructive" : ""}`}
-              placeholder="Amount"
-            />
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1 min-w-0">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                {sourceSymbol}
+              </span>
+              <Input
+                type="number"
+                min={1}
+                max={1_000_000_000}
+                value={amount || ""}
+                onChange={(e) => setAmount(Number(e.target.value) || 0)}
+                className={`pl-8 ${amount > 1_000_000_000 ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                placeholder="Amount"
+              />
+            </div>
+            <div className="flex items-center text-muted-foreground text-sm shrink-0">
+              → {to}
+            </div>
           </div>
           {amount > 1_000_000_000 && (
             <p className="text-xs text-destructive">
               Max amount is {sourceSymbol}1,000,000,000
             </p>
           )}
-          <div className="flex items-center text-muted-foreground text-sm">
-            → {to}
-          </div>
         </div>
 
         <AnimatePresence mode="popLayout">
@@ -162,11 +164,11 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
           value={recipientMode}
           onValueChange={(v) => setRecipientMode(v as RecipientMode)}
         >
-          <TabsList className="w-full h-8">
-            <TabsTrigger value="WALLET" className="flex-1 text-xs">
+          <TabsList className="w-full h-9 sm:h-8">
+            <TabsTrigger value="WALLET" className="flex-1 text-sm sm:text-xs">
               Wallet
             </TabsTrigger>
-            <TabsTrigger value="BANK" className="flex-1 text-xs">
+            <TabsTrigger value="BANK" className="flex-1 text-sm sm:text-xs">
               Bank
             </TabsTrigger>
           </TabsList>
