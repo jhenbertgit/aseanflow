@@ -24,6 +24,63 @@ export class UserService {
     const aftWallet =
       user.transfers.find((t) => t.rewardWallet)?.rewardWallet ?? null;
 
+    // recipientWalletId stores account numbers (e.g. AF0000000001), not wallet IDs
+    const accountNumbersToResolve = user.transfers
+      .filter((t) => !t.recipientName && t.recipientWalletId)
+      .map((t) => t.recipientWalletId!);
+
+    const recipientUsers = accountNumbersToResolve.length
+      ? await this.prisma.user.findMany({
+          where: { accountNumber: { in: accountNumbersToResolve } },
+          select: { accountNumber: true, name: true },
+        })
+      : [];
+    const recipientNameMap = new Map(recipientUsers.map((u) => [u.accountNumber, u.name]));
+
+    const incomingTransfers = await this.prisma.transfer.findMany({
+      where: {
+        recipientWalletId: user.accountNumber,
+        senderId: { not: user.id },
+      },
+      include: { sender: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+
+    const outgoing = user.transfers.map((t) => ({
+      trackingCode: t.trackingCode,
+      status: t.status,
+      sendAmount: Number(t.sendAmount),
+      receiveAmount: Number(t.receiveAmount),
+      sourceCurrency: t.sourceCurrency,
+      targetCurrency: t.targetCurrency,
+      fee: Number(t.fee),
+      createdAt: t.createdAt.toISOString(),
+      direction: 'outgoing' as const,
+      senderName: user.name,
+      recipientName:
+        t.recipientName ??
+        (t.recipientWalletId ? recipientNameMap.get(t.recipientWalletId) ?? null : null),
+    }));
+
+    const incoming = incomingTransfers.map((t) => ({
+      trackingCode: t.trackingCode,
+      status: t.status,
+      sendAmount: Number(t.sendAmount),
+      receiveAmount: Number(t.receiveAmount),
+      sourceCurrency: t.sourceCurrency,
+      targetCurrency: t.targetCurrency,
+      fee: Number(t.fee),
+      createdAt: t.createdAt.toISOString(),
+      direction: 'incoming' as const,
+      senderName: t.sender?.name ?? null,
+      recipientName: user.name,
+    }));
+
+    const allTransfers = [...outgoing, ...incoming].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
     return {
       user: {
         id: user.id,
@@ -36,17 +93,8 @@ export class UserService {
         currency: w.currency,
         balance: w.balance.toString(),
       })),
-      recentTransfers: user.transfers.map((t) => ({
-        trackingCode: t.trackingCode,
-        status: t.status,
-        sendAmount: Number(t.sendAmount),
-        receiveAmount: Number(t.receiveAmount),
-        sourceCurrency: t.sourceCurrency,
-        targetCurrency: t.targetCurrency,
-        fee: Number(t.fee),
-        createdAt: t.createdAt.toISOString(),
-      })),
-      totalTransfers: user.transfers.length,
+      recentTransfers: allTransfers.slice(0, 50),
+      totalTransfers: allTransfers.length,
       aftBalance: user.transfers
         .filter((t) => t.rewardAmount !== null)
         .reduce((sum, t) => sum.plus(t.rewardAmount), new Prisma.Decimal(0))

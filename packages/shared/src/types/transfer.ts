@@ -114,6 +114,9 @@ export interface TransferListItem {
   targetCurrency: string;
   fee: number;
   createdAt: string;
+  direction: 'outgoing' | 'incoming';
+  senderName: string | null;
+  recipientName: string | null;
 }
 
 export interface DashboardResponse {

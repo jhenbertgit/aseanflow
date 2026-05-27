@@ -48,9 +48,45 @@ function formatStatus(status: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function CounterpartyLabel({ t }: { t: TransferListItem }) {
+  if (t.direction === "incoming") {
+    return (
+      <span className="text-sm">
+        <span className="text-muted-foreground">From: </span>
+        <span className="font-medium">{t.senderName ?? "Unknown"}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="text-sm">
+      <span className="text-muted-foreground">To: </span>
+      <span className="font-medium">{t.recipientName ?? "Unknown"}</span>
+    </span>
+  );
+}
+
+function AmountDisplay({ t }: { t: TransferListItem }) {
+  const srcSym = CURRENCY_SYMBOLS[t.sourceCurrency as keyof typeof CURRENCY_SYMBOLS] ?? "";
+  const isIncoming = t.direction === "incoming";
+
+  return (
+    <span
+      className={
+        isIncoming
+          ? "text-primary font-medium"
+          : "text-red-500 dark:text-red-400 font-medium"
+      }
+    >
+      {isIncoming ? "+" : "-"}
+      {srcSym}
+      {t.sendAmount.toLocaleString()} → {t.targetCurrency}
+    </span>
+  );
+}
+
 function TransferRow({ t, i }: { t: TransferListItem; i: number }) {
   const badge = STATUS_BADGE[t.status] ?? STATUS_BADGE.CREATED;
-  const srcSym = CURRENCY_SYMBOLS[t.sourceCurrency as keyof typeof CURRENCY_SYMBOLS] ?? "";
+
   return (
     <motion.tr
       initial={{ opacity: 0 }}
@@ -63,7 +99,12 @@ function TransferRow({ t, i }: { t: TransferListItem; i: number }) {
           {t.trackingCode}
         </Link>
       </td>
-      <td className="py-2">{srcSym}{t.sendAmount.toLocaleString()} → {t.targetCurrency}</td>
+      <td className="py-2">
+        <CounterpartyLabel t={t} />
+      </td>
+      <td className="py-2">
+        <AmountDisplay t={t} />
+      </td>
       <td className="py-2">
         <span className={`inline-block px-2 py-0.5 rounded-full text-xs ${badge}`}>
           {formatStatus(t.status)}
@@ -76,16 +117,18 @@ function TransferRow({ t, i }: { t: TransferListItem; i: number }) {
 
 function TransferCard({ t, i }: { t: TransferListItem; i: number }) {
   const badge = STATUS_BADGE[t.status] ?? STATUS_BADGE.CREATED;
-  const srcSym = CURRENCY_SYMBOLS[t.sourceCurrency as keyof typeof CURRENCY_SYMBOLS] ?? "";
+
   return (
     <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
       <Link href={`/transfer/${t.trackingCode}`} className="block rounded-lg border p-3 hover:bg-muted/30 transition-colors">
         <div className="flex justify-between items-start mb-1">
-          <span className="font-mono text-xs">{t.trackingCode}</span>
+          <CounterpartyLabel t={t} />
           <span className={`px-2 py-0.5 rounded-full text-xs ${badge}`}>{formatStatus(t.status)}</span>
         </div>
-        <p className="text-sm font-medium">{srcSym}{t.sendAmount.toLocaleString()} → {t.targetCurrency}</p>
-        <p className="text-xs text-muted-foreground mt-1">{formatDate(t.createdAt)}</p>
+        <div className="flex justify-between items-center mt-1">
+          <AmountDisplay t={t} />
+          <span className="text-xs text-muted-foreground">{formatDate(t.createdAt)}</span>
+        </div>
       </Link>
     </motion.div>
   );
@@ -112,6 +155,7 @@ export function TransferHistory({ transfers }: TransferHistoryProps) {
             <thead>
               <tr className="border-b text-muted-foreground text-xs">
                 <th className="text-left py-2 font-medium">Tracking</th>
+                <th className="text-left py-2 font-medium">From / To</th>
                 <th className="text-left py-2 font-medium">Amount</th>
                 <th className="text-left py-2 font-medium">Status</th>
                 <th className="text-left py-2 font-medium">Date</th>
@@ -125,7 +169,7 @@ export function TransferHistory({ transfers }: TransferHistoryProps) {
           </table>
         </div>
 
-        {/* Mobile cards */}
+        {/* Mobile cards — tracking hidden */}
         <div className="sm:hidden space-y-2">
           {visible.map((t, i) => (
             <TransferCard key={t.trackingCode} t={t} i={i} />
