@@ -24,27 +24,11 @@ export class UserService {
     const aftWallet =
       user.transfers.find((t) => t.rewardWallet)?.rewardWallet ?? null;
 
-    // recipientWalletId stores account numbers (e.g. AF0000000001), not wallet IDs
-    const accountNumbersToResolve = user.transfers
-      .filter((t) => !t.recipientName && t.recipientWalletId)
-      .map((t) => t.recipientWalletId);
-
-    const recipientUsers = accountNumbersToResolve.length
-      ? await this.prisma.user.findMany({
-          where: { accountNumber: { in: accountNumbersToResolve } },
-          select: { accountNumber: true, name: true },
-        })
-      : [];
-    const recipientNameMap = new Map(
-      recipientUsers.map((u) => [u.accountNumber, u.name]),
-    );
-
     const incomingTransfers = await this.prisma.transfer.findMany({
       where: {
         recipientWalletId: user.accountNumber,
         senderId: { not: user.id },
       },
-      include: { sender: { select: { name: true } } },
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
@@ -59,12 +43,8 @@ export class UserService {
       fee: Number(t.fee),
       createdAt: t.createdAt.toISOString(),
       direction: 'outgoing' as const,
-      senderName: user.name,
-      recipientName:
-        t.recipientName ??
-        (t.recipientWalletId
-          ? (recipientNameMap.get(t.recipientWalletId) ?? null)
-          : null),
+      senderName: t.senderName ?? user.name,
+      recipientName: t.recipientName ?? null,
     }));
 
     const incoming = incomingTransfers.map((t) => ({
@@ -77,8 +57,8 @@ export class UserService {
       fee: Number(t.fee),
       createdAt: t.createdAt.toISOString(),
       direction: 'incoming' as const,
-      senderName: t.sender?.name ?? null,
-      recipientName: user.name,
+      senderName: t.senderName ?? null,
+      recipientName: t.recipientName ?? user.name,
     }));
 
     const allTransfers = [...outgoing, ...incoming].sort(

@@ -51,8 +51,10 @@ model Transfer {
   recipientAccount  String?
   recipientWalletId String?
 
-  senderId       String?
-  walletId       String?
+  senderId            String?
+  senderName          String?
+  senderAccountNumber String?
+  walletId            String?
   rewardTxHash   String?
   rewardAmount   Decimal?       @db.Decimal(48, 18)
 

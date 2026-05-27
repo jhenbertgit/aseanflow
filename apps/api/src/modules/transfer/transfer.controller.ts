@@ -66,8 +66,8 @@ export class TransferController {
     const t = await this.transferService.getByTrackingCode(trackingCode);
     return {
       ...t,
-      senderName: t.sender?.name ?? null,
-      senderAccountNumber: t.sender?.accountNumber ?? null,
+      senderName: t.senderName,
+      senderAccountNumber: t.senderAccountNumber,
     };
   }
 }

@@ -98,6 +98,20 @@ export class TransferService {
     }
 
     let resolvedRecipientName = dto.recipientName || null;
+    let resolvedSenderName: string | null = null;
+    let resolvedSenderAccountNumber: string | null = null;
+
+    // Resolve sender name/account
+    if (dto.senderId) {
+      const sender = await this.prisma.user.findUnique({
+        where: { id: dto.senderId },
+        select: { name: true, accountNumber: true },
+      });
+      if (sender) {
+        resolvedSenderName = sender.name;
+        resolvedSenderAccountNumber = sender.accountNumber;
+      }
+    }
 
     // Validate recipient account number for WALLET transfers and resolve name
     if (dto.recipientType === 'WALLET' && dto.recipientWalletId) {
@@ -136,6 +150,8 @@ export class TransferService {
         recipientBank: dto.recipientBank || null,
         recipientAccount: dto.recipientAccount || null,
         senderId: dto.senderId || null,
+        senderName: resolvedSenderName,
+        senderAccountNumber: resolvedSenderAccountNumber,
       },
     });
 
@@ -194,7 +210,7 @@ export class TransferService {
   async getByTrackingCode(trackingCode: string) {
     const transfer = await this.prisma.transfer.findUnique({
       where: { trackingCode },
-      include: { ledgerEntries: true, rewardWallet: true, sender: true },
+      include: { ledgerEntries: true, rewardWallet: true },
     });
 
     if (!transfer) {
