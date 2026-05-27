@@ -61,7 +61,7 @@ export function ActivityFeed({ transfers }: ActivityFeedProps) {
               transition={{ duration: 0.2, delay: i * 0.05 }}
             >
               <Link
-                href={`/transfer/${t.trackingCode}`}
+                href={`/transfer/${t.trackingCode}?direction=${t.direction}`}
                 className="flex items-center gap-3 rounded-lg p-3 sm:p-2 hover:bg-muted/50 transition-colors"
               >
                 <span className="text-lg">{config.icon}</span>

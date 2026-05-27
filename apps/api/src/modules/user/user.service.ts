@@ -27,7 +27,7 @@ export class UserService {
     // recipientWalletId stores account numbers (e.g. AF0000000001), not wallet IDs
     const accountNumbersToResolve = user.transfers
       .filter((t) => !t.recipientName && t.recipientWalletId)
-      .map((t) => t.recipientWalletId!);
+      .map((t) => t.recipientWalletId);
 
     const recipientUsers = accountNumbersToResolve.length
       ? await this.prisma.user.findMany({
@@ -35,7 +35,9 @@ export class UserService {
           select: { accountNumber: true, name: true },
         })
       : [];
-    const recipientNameMap = new Map(recipientUsers.map((u) => [u.accountNumber, u.name]));
+    const recipientNameMap = new Map(
+      recipientUsers.map((u) => [u.accountNumber, u.name]),
+    );
 
     const incomingTransfers = await this.prisma.transfer.findMany({
       where: {
@@ -60,7 +62,9 @@ export class UserService {
       senderName: user.name,
       recipientName:
         t.recipientName ??
-        (t.recipientWalletId ? recipientNameMap.get(t.recipientWalletId) ?? null : null),
+        (t.recipientWalletId
+          ? (recipientNameMap.get(t.recipientWalletId) ?? null)
+          : null),
     }));
 
     const incoming = incomingTransfers.map((t) => ({
@@ -78,7 +82,8 @@ export class UserService {
     }));
 
     const allTransfers = [...outgoing, ...incoming].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
     return {

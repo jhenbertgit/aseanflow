@@ -97,7 +97,9 @@ export class TransferService {
       receiveAmount = quote.receiveAmount;
     }
 
-    // Validate recipient account number for WALLET transfers
+    let resolvedRecipientName = dto.recipientName || null;
+
+    // Validate recipient account number for WALLET transfers and resolve name
     if (dto.recipientType === 'WALLET' && dto.recipientWalletId) {
       const recipient = await this.prisma.user.findUnique({
         where: { accountNumber: dto.recipientWalletId },
@@ -106,6 +108,9 @@ export class TransferService {
         throw new BadRequestException(
           `Recipient account ${dto.recipientWalletId} not found`,
         );
+      }
+      if (!resolvedRecipientName) {
+        resolvedRecipientName = recipient.name;
       }
     }
 
@@ -124,7 +129,7 @@ export class TransferService {
         walletId,
         recipientType: dto.recipientType as 'WALLET' | 'BANK',
         recipientWalletId: dto.recipientWalletId || null,
-        recipientName: dto.recipientName || null,
+        recipientName: resolvedRecipientName,
         recipientBank: dto.recipientBank || null,
         recipientAccount: dto.recipientAccount || null,
         senderId: dto.senderId || null,
@@ -186,7 +191,7 @@ export class TransferService {
   async getByTrackingCode(trackingCode: string) {
     const transfer = await this.prisma.transfer.findUnique({
       where: { trackingCode },
-      include: { ledgerEntries: true, rewardWallet: true },
+      include: { ledgerEntries: true, rewardWallet: true, sender: true },
     });
 
     if (!transfer) {

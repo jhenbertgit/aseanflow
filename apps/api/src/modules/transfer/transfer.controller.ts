@@ -63,6 +63,11 @@ export class TransferController {
   async getTransfer(
     @Param('trackingCode', TrackingCodePipe) trackingCode: string,
   ) {
-    return this.transferService.getByTrackingCode(trackingCode);
+    const t = await this.transferService.getByTrackingCode(trackingCode);
+    return {
+      ...t,
+      senderName: t.sender?.name ?? null,
+      senderAccountNumber: t.sender?.accountNumber ?? null,
+    };
   }
 }

@@ -3,6 +3,7 @@
 import { use } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@aseanflow/ui/components/button";
 import { Badge } from "@aseanflow/ui/components/badge";
@@ -26,6 +27,8 @@ export default function TransferPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: trackingCode } = use(params);
+  const searchParams = useSearchParams();
+  const isIncoming = searchParams.get("direction") === "incoming";
   const { data: transfer, isLoading, error } = useTransferStatus(trackingCode);
   const { data: wallet } = useWallet(trackingCode);
   const showLoading = isLoading && !transfer;
@@ -108,14 +111,14 @@ export default function TransferPage({
                 >
                   <div className="space-y-2 rounded-lg bg-muted/50 p-4">
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">You send</span>
+                      <span className="text-muted-foreground">{isIncoming ? "They send" : "You send"}</span>
                       <span>
                         {CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.sendAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">They receive</span>
+                      <span className="text-muted-foreground">{isIncoming ? "You receive" : "They receive"}</span>
                       <span>
                         {CURRENCY_SYMBOLS[transfer.targetCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.receiveAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -135,9 +138,11 @@ export default function TransferPage({
                     </div>
                     <hr className="border-border" />
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">Recipient</span>
-                      {transfer.recipientType === "WALLET" ? (
-                        <span>Wallet •••{transfer.recipientWalletId?.slice(-4) ?? "????"}</span>
+                      <span className="text-muted-foreground">{isIncoming ? "Sender" : "Recipient"}</span>
+                      {isIncoming ? (
+                        <span>{transfer.senderName ?? "Unknown"} • Account •••{(transfer.senderAccountNumber ?? "????").slice(-4)}</span>
+                      ) : transfer.recipientType === "WALLET" ? (
+                        <span>{transfer.recipientName ?? "Unknown"} • Account •••{transfer.recipientWalletId?.slice(-4) ?? "????"}</span>
                       ) : (
                         <span>{transfer.recipientName} • {transfer.recipientBank} •••{transfer.recipientAccount?.slice(-4) ?? "????"}</span>
                       )}

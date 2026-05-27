@@ -95,7 +95,7 @@ function TransferRow({ t, i }: { t: TransferListItem; i: number }) {
       className="border-b last:border-0 hover:bg-muted/30 transition-colors"
     >
       <td className="py-2">
-        <Link href={`/transfer/${t.trackingCode}`} className="font-mono text-xs text-primary hover:underline">
+        <Link href={`/transfer/${t.trackingCode}?direction=${t.direction}`} className="font-mono text-xs text-primary hover:underline">
           {t.trackingCode}
         </Link>
       </td>
@@ -120,7 +120,7 @@ function TransferCard({ t, i }: { t: TransferListItem; i: number }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-      <Link href={`/transfer/${t.trackingCode}`} className="block rounded-lg border p-3 hover:bg-muted/30 transition-colors">
+      <Link href={`/transfer/${t.trackingCode}?direction=${t.direction}`} className="block rounded-lg border p-3 hover:bg-muted/30 transition-colors">
         <div className="flex justify-between items-start mb-1">
           <CounterpartyLabel t={t} />
           <span className={`px-2 py-0.5 rounded-full text-xs ${badge}`}>{formatStatus(t.status)}</span>

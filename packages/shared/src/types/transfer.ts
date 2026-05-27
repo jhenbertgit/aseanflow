@@ -82,6 +82,8 @@ export interface TransferDetailResponse {
   recipientName: string | null;
   recipientBank: string | null;
   recipientAccount: string | null;
+  senderName: string | null;
+  senderAccountNumber: string | null;
   morphTxHash: string | null;
   walletAddress: string | null;
   rewardTxHash: string | null;
@@ -116,6 +118,7 @@ export interface TransferListItem {
   createdAt: string;
   direction: 'outgoing' | 'incoming';
   senderName: string | null;
+  senderAccountNumber: string | null;
   recipientName: string | null;
 }
 
