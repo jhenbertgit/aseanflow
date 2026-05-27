@@ -55,8 +55,8 @@ export default function TransferPage({
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex flex-wrap items-center gap-2 text-base sm:text-lg">
-              <span className="break-all">Tracking: {trackingCode}</span>
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <span className="min-w-0 truncate">Tracking: {trackingCode}</span>
               {transfer && (
                 <Badge
                   variant={
@@ -64,6 +64,7 @@ export default function TransferPage({
                       ? "default"
                       : "secondary"
                   }
+                  className="shrink-0"
                 >
                   {transfer.status.replace(/_/g, " ")}
                 </Badge>
@@ -109,42 +110,45 @@ export default function TransferPage({
                   exit={{ opacity: 0 }}
                   className="space-y-6"
                 >
-                  <div className="space-y-2 rounded-lg bg-muted/50 p-4">
+                  <div className="space-y-2 rounded-lg bg-muted/50 p-3 sm:p-4">
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">{isIncoming ? "They send" : "You send"}</span>
-                      <span>
+                      <span className="shrink-0 text-muted-foreground">{isIncoming ? "They send" : "You send"}</span>
+                      <span className="text-right font-medium">
                         {CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.sendAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">{isIncoming ? "You receive" : "They receive"}</span>
-                      <span>
+                      <span className="shrink-0 text-muted-foreground">{isIncoming ? "You receive" : "They receive"}</span>
+                      <span className="text-right font-medium">
                         {CURRENCY_SYMBOLS[transfer.targetCurrency as keyof typeof CURRENCY_SYMBOLS]}
                         {Number(transfer.receiveAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">Rate</span>
-                      <span>
+                      <span className="shrink-0 text-muted-foreground">Rate</span>
+                      <span className="text-right">
                         1 {transfer.sourceCurrency} ={" "}
                         {Number(transfer.exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}{" "}
                         {transfer.targetCurrency}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm gap-2">
-                      <span className="text-muted-foreground">Fee</span>
-                      <span>{CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}{Number(transfer.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="shrink-0 text-muted-foreground">Fee</span>
+                      <span className="text-right">
+                        {CURRENCY_SYMBOLS[transfer.sourceCurrency as keyof typeof CURRENCY_SYMBOLS]}
+                        {Number(transfer.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
                     </div>
                     <hr className="border-border" />
-                    <div className="flex justify-between text-sm gap-2">
+                    <div className="flex flex-col gap-0.5 text-sm sm:flex-row sm:justify-between sm:gap-2">
                       <span className="text-muted-foreground">{isIncoming ? "Sender" : "Recipient"}</span>
                       {isIncoming ? (
-                        <span>{transfer.senderName ?? "Unknown"} • Account •••{(transfer.senderAccountNumber ?? "????").slice(-4)}</span>
+                        <span className="truncate text-right">{transfer.senderName ?? "Unknown"} • Account •••{(transfer.senderAccountNumber ?? "????").slice(-4)}</span>
                       ) : transfer.recipientType === "WALLET" ? (
-                        <span>{transfer.recipientName ?? "Unknown"} • Account •••{transfer.recipientWalletId?.slice(-4) ?? "????"}</span>
+                        <span className="truncate text-right">{transfer.recipientName ?? "Unknown"} • Account •••{transfer.recipientWalletId?.slice(-4) ?? "????"}</span>
                       ) : (
-                        <span>{transfer.recipientName} • {transfer.recipientBank} •••{transfer.recipientAccount?.slice(-4) ?? "????"}</span>
+                        <span className="truncate text-right">{transfer.recipientName} • {transfer.recipientBank} •••{transfer.recipientAccount?.slice(-4) ?? "????"}</span>
                       )}
                     </div>
                   </div>
