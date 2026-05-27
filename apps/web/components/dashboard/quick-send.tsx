@@ -49,7 +49,7 @@ export function QuickSend({ userId, accountNumber, lastTrackingCode }: QuickSend
   const targetSymbol = CURRENCY_SYMBOLS[to];
   const bankList = to === "IDR" ? INDONESIAN_BANKS : PHILIPPINE_BANKS;
 
-  const { data: quote, isLoading } = useQuote(amount, from, to);
+  const { data: quote, isLoading } = useQuote(amount, from, to, lastTrackingCode);
   const createTransfer = useCreateTransfer();
 
   const isAmountValid = amount >= 1 && amount <= 1_000_000;

@@ -90,7 +90,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Balance cards */}
-      <BalanceCards wallets={dashboard.wallets} aftBalance={dashboard.aftBalance} aftWalletAddress={dashboard.aftWalletAddress} accountNumber={dashboard.user.accountNumber} latestTrackingCode={dashboard.recentTransfers[0]?.trackingCode} />
+      <BalanceCards wallets={dashboard.wallets} aftBalance={dashboard.aftBalance} aftWalletAddress={dashboard.aftWalletAddress} accountNumber={dashboard.user.accountNumber} latestTrackingCode={dashboard.lastOutgoingTrackingCode ?? undefined} />
 
       {/* Quick send + Recent Activity side-by-side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
@@ -102,7 +102,7 @@ export default function DashboardPage() {
           <QuickSend
             userId={dashboard.user.id}
             accountNumber={dashboard.user.accountNumber}
-            lastTrackingCode={dashboard.recentTransfers[0]?.trackingCode}
+            lastTrackingCode={dashboard.lastOutgoingTrackingCode ?? undefined}
           />
         </motion.div>
         <motion.div

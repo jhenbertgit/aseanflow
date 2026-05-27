@@ -129,4 +129,5 @@ export interface DashboardResponse {
   totalTransfers: number;
   aftBalance: string;
   aftWalletAddress: string | null;
+  lastOutgoingTrackingCode: string | null;
 }

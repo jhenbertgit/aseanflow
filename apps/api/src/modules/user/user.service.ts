@@ -85,6 +85,7 @@ export class UserService {
         .reduce((sum, t) => sum.plus(t.rewardAmount), new Prisma.Decimal(0))
         .toString(),
       aftWalletAddress: aftWallet?.address ?? null,
+      lastOutgoingTrackingCode: user.transfers[0]?.trackingCode ?? null,
     };
   }
 
