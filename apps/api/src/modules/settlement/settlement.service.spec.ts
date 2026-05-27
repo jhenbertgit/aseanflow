@@ -57,7 +57,10 @@ describe('SettlementService', () => {
   let transferService: { advanceStatus: jest.Mock };
   let instapay: { simulate: jest.Mock };
   let bifast: { simulate: jest.Mock };
-  let prisma: { transfer: { update: jest.Mock; findUnique: jest.Mock } };
+  let prisma: {
+    transfer: { update: jest.Mock; findUnique: jest.Mock };
+    $transaction: jest.Mock;
+  };
   let eventEmitter: { emit: jest.Mock };
   let morphQueue: { add: jest.Mock };
   let rewardQueue: { add: jest.Mock };
@@ -78,14 +81,32 @@ describe('SettlementService', () => {
         timestamp: Date.now(),
       }),
     };
+    const txMock = {
+      accountWallet: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'w1' }),
+        update: jest.fn().mockResolvedValue({}),
+        upsert: jest.fn().mockResolvedValue({}),
+      },
+      ledgerEntry: { create: jest.fn().mockResolvedValue({}) },
+      user: { findUnique: jest.fn().mockResolvedValue({ id: 'u1' }) },
+    };
+
     prisma = {
       transfer: {
         update: jest.fn().mockResolvedValue({}),
         findUnique: jest.fn().mockResolvedValue({
           trackingCode: 'TXNTEST',
           sourceCurrency: 'PHP',
+          targetCurrency: 'IDR',
+          senderId: null,
+          recipientType: 'BANK',
+          recipientWalletId: null,
+          sendAmount: new (require('@aseanflow/database').Prisma).Decimal(100),
+          receiveAmount: new (require('@aseanflow/database').Prisma).Decimal(2500000),
+          fee: new (require('@aseanflow/database').Prisma).Decimal(5),
         }),
       },
+      $transaction: jest.fn((cb) => cb(txMock)),
     };
     eventEmitter = { emit: jest.fn() };
     morphQueue = { add: jest.fn().mockResolvedValue({}) };
@@ -182,6 +203,13 @@ describe('SettlementService', () => {
     prisma.transfer.findUnique.mockResolvedValue({
       trackingCode: 'TXNIDR',
       sourceCurrency: 'IDR',
+      targetCurrency: 'PHP',
+      senderId: null,
+      recipientType: 'BANK',
+      recipientWalletId: null,
+      sendAmount: new (require('@aseanflow/database').Prisma).Decimal(100),
+      receiveAmount: new (require('@aseanflow/database').Prisma).Decimal(2500000),
+      fee: new (require('@aseanflow/database').Prisma).Decimal(5),
     });
 
     await service.orchestrate('t2');
