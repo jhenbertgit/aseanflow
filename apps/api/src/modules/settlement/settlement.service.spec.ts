@@ -5,6 +5,7 @@ import { InstapaySimulator } from './instapay.simulator';
 import { BifastSimulator } from './bifast.simulator';
 import { TransferService } from '../transfer/transfer.service';
 import { PrismaService } from '../../common/services/prisma.service';
+import { Prisma } from '@aseanflow/database';
 
 describe('InstapaySimulator', () => {
   let simulator: InstapaySimulator;
@@ -101,9 +102,9 @@ describe('SettlementService', () => {
           senderId: null,
           recipientType: 'BANK',
           recipientWalletId: null,
-          sendAmount: new (require('@aseanflow/database').Prisma).Decimal(100),
-          receiveAmount: new (require('@aseanflow/database').Prisma).Decimal(2500000),
-          fee: new (require('@aseanflow/database').Prisma).Decimal(5),
+          sendAmount: new Prisma.Decimal(100),
+          receiveAmount: new Prisma.Decimal(2500000),
+          fee: new Prisma.Decimal(5),
         }),
       },
       $transaction: jest.fn((cb) => cb(txMock)),
@@ -207,9 +208,9 @@ describe('SettlementService', () => {
       senderId: null,
       recipientType: 'BANK',
       recipientWalletId: null,
-      sendAmount: new (require('@aseanflow/database').Prisma).Decimal(100),
-      receiveAmount: new (require('@aseanflow/database').Prisma).Decimal(2500000),
-      fee: new (require('@aseanflow/database').Prisma).Decimal(5),
+      sendAmount: new Prisma.Decimal(100),
+      receiveAmount: new Prisma.Decimal(2500000),
+      fee: new Prisma.Decimal(5),
     });
 
     await service.orchestrate('t2');
