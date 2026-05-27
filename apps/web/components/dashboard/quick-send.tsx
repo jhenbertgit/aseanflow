@@ -30,10 +30,11 @@ type RecipientMode = "WALLET" | "BANK";
 
 interface QuickSendProps {
   userId?: string;
+  accountNumber?: string;
   lastTrackingCode?: string;
 }
 
-export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
+export function QuickSend({ userId, accountNumber, lastTrackingCode }: QuickSendProps) {
   const [amount, setAmount] = useState<number>(1000);
   const [direction, setDirection] = useState<Direction>("PHP_TO_IDR");
   const [recipientMode, setRecipientMode] = useState<RecipientMode>("WALLET");
@@ -54,13 +55,14 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
   const isAmountValid = amount >= 1 && amount <= 1_000_000;
   const isSubmitting = createTransfer.isPending;
 
+  const isSelfSend = recipientMode === "WALLET" && accountNumber && recipientAccountNumber.trim() === accountNumber;
   const isWalletRecipientValid = recipientAccountNumber.trim().length > 0;
   const isBankRecipientValid =
     recipientName.trim().length >= 2 &&
     recipientBank.length > 0 &&
     /^\d{6,20}$/.test(recipientAccount);
   const isRecipientValid =
-    recipientMode === "WALLET" ? isWalletRecipientValid : isBankRecipientValid;
+    (recipientMode === "WALLET" ? isWalletRecipientValid : isBankRecipientValid) && !isSelfSend;
 
   function handleSwap() {
     setDirection((d) => (d === "PHP_TO_IDR" ? "IDR_TO_PHP" : "PHP_TO_IDR"));
@@ -151,7 +153,7 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
               exit={{ opacity: 0 }}
               className="flex justify-between text-sm rounded-lg bg-muted/50 px-3 py-2"
             >
-              <span className="text-muted-foreground">You get</span>
+              <span className="text-muted-foreground">They get</span>
               <span className="font-medium">
                 {targetSymbol}{" "}
                 {quote.receiveAmount.toLocaleString(undefined, {
@@ -189,7 +191,11 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
                 value={recipientAccountNumber}
                 onChange={(e) => setRecipientAccountNumber(e.target.value.trim())}
                 placeholder="Account Number (e.g. AF0000000001)"
+                className={isSelfSend ? "border-destructive focus-visible:ring-destructive" : ""}
               />
+              {isSelfSend && (
+                <p className="text-xs text-destructive">Cannot send to your own account</p>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -242,7 +248,7 @@ export function QuickSend({ userId, lastTrackingCode }: QuickSendProps) {
 
         {createTransfer.error && (
           <p className="text-xs text-destructive text-center">
-            {createTransfer.error instanceof Error && createTransfer.error.message.includes("not found")
+            {createTransfer.error instanceof Error && (createTransfer.error.message.includes("not found") || createTransfer.error.message.includes("own account"))
               ? createTransfer.error.message
               : "Transfer failed. Try again."}
           </p>

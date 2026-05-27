@@ -109,6 +109,9 @@ export class TransferService {
           `Recipient account ${dto.recipientWalletId} not found`,
         );
       }
+      if (dto.senderId && recipient.id === dto.senderId) {
+        throw new BadRequestException('Cannot send to your own account');
+      }
       if (!resolvedRecipientName) {
         resolvedRecipientName = recipient.name;
       }

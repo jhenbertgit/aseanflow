@@ -101,6 +101,7 @@ export default function DashboardPage() {
         >
           <QuickSend
             userId={dashboard.user.id}
+            accountNumber={dashboard.user.accountNumber}
             lastTrackingCode={dashboard.recentTransfers[0]?.trackingCode}
           />
         </motion.div>
