@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
 import { TransferModule } from '../transfer/transfer.module';
@@ -8,7 +8,7 @@ import { InstapaySimulator } from './instapay.simulator';
 import { BifastSimulator } from './bifast.simulator';
 
 @Module({
-  imports: [TransferModule, LedgerModule],
+  imports: [forwardRef(() => TransferModule), LedgerModule],
   providers: [
     InstapaySimulator,
     BifastSimulator,

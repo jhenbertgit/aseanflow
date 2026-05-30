@@ -1,28 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Queue } from 'bullmq';
+import { Module, forwardRef } from '@nestjs/common';
 import { TransferController } from './transfer.controller';
 import { TransferService } from './transfer.service';
 import { WalletModule } from '../wallet/wallet.module';
+import { SettlementModule } from '../settlement/settlement.module';
 
 @Module({
-  imports: [WalletModule],
+  imports: [WalletModule, forwardRef(() => SettlementModule)],
   controllers: [TransferController],
-  providers: [
-    TransferService,
-    {
-      provide: 'SETTLEMENT_QUEUE',
-      useFactory: (configService: ConfigService) => {
-        return new Queue('settlement', {
-          connection: {
-            host: configService.get<string>('REDIS_HOST', 'localhost'),
-            port: configService.get<number>('REDIS_PORT', 6380),
-          },
-        });
-      },
-      inject: [ConfigService],
-    },
-  ],
+  providers: [TransferService],
   exports: [TransferService],
 })
 export class TransferModule {}

@@ -5,7 +5,7 @@ import {
   Prisma,
 } from "@aseanflow/database";
 
-const STATUS_ORDER: TransferStatus[] = [
+const STATUS_ORDER_PHP_TO_IDR: TransferStatus[] = [
   "CREATED",
   "QUOTE_LOCKED",
   "INSTA_PAY_PROCESSING",
@@ -14,6 +14,22 @@ const STATUS_ORDER: TransferStatus[] = [
   "SETTLED",
   "MORPH_ANCHORED",
 ];
+
+const STATUS_ORDER_IDR_TO_PHP: TransferStatus[] = [
+  "CREATED",
+  "QUOTE_LOCKED",
+  "BI_FAST_PROCESSING",
+  "FX_CONVERSION",
+  "INSTA_PAY_PROCESSING",
+  "SETTLED",
+  "MORPH_ANCHORED",
+];
+
+function getStatusOrder(sourceCurrency: string): TransferStatus[] {
+  return sourceCurrency === "IDR"
+    ? STATUS_ORDER_IDR_TO_PHP
+    : STATUS_ORDER_PHP_TO_IDR;
+}
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -36,8 +52,9 @@ export function createSettlementProcessor(prisma: PrismaClient) {
       throw new Error(`Transfer ${transferId} not found`);
     }
 
-    const currentIndex = STATUS_ORDER.indexOf(transfer.status);
-    const newIndex = STATUS_ORDER.indexOf(newStatus);
+    const statusOrder = getStatusOrder(transfer.sourceCurrency);
+    const currentIndex = statusOrder.indexOf(transfer.status);
+    const newIndex = statusOrder.indexOf(newStatus);
 
     if (newIndex !== currentIndex + 1) {
       throw new Error(`Invalid transition: ${transfer.status} -> ${newStatus}`);
