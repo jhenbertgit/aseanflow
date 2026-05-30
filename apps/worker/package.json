@@ -2,6 +2,7 @@
   "name": "@aseanflow/worker",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsx watch -r dotenv/config src/main.ts",
     "start": "tsx src/main.ts",
