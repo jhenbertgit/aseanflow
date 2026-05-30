@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@aseanflow/ui/components/button";
 import {
@@ -26,6 +27,7 @@ export function WalletInfo({ address, balance }: WalletInfoProps) {
   async function copyAddress() {
     await navigator.clipboard.writeText(address);
     setCopied(true);
+    toast.success("Copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   }
 

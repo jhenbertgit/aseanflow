@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   createTransfer,
   getTransferByTrackingCode,
@@ -54,7 +55,11 @@ export function useCreateTransfer() {
     mutationFn: (payload: CreateTransferPayload) => createTransfer(payload),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success(`Transfer created! Tracking code: ${data.trackingCode}`);
       router.push(`/transfer/${data.trackingCode}`);
+    },
+    onError: () => {
+      toast.error("Transfer failed. Please try again.");
     },
   });
 }

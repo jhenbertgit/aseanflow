@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Eye, EyeOff, Copy, Check } from "lucide-react";
 
 interface UserHeaderProps {
@@ -17,6 +18,7 @@ export function UserHeader({ name, aftWalletAddress }: UserHeaderProps) {
     if (!aftWalletAddress) return;
     await navigator.clipboard.writeText(aftWalletAddress);
     setCopied(true);
+    toast.success("Copied to clipboard");
     setTimeout(() => setCopied(false), 1500);
   }, [aftWalletAddress]);
 
