@@ -1,8 +1,16 @@
-import { Controller, Post, Get, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
+  Inject,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Queue } from 'bullmq';
 import { TransferService } from './transfer.service';
 import { FxService } from '../fx/fx.service';
-import { SettlementService } from '../settlement/settlement.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { TrackingCodePipe } from '../../common/pipes/tracking-code.pipe';
@@ -13,7 +21,7 @@ export class TransferController {
   constructor(
     private readonly transferService: TransferService,
     private readonly fxService: FxService,
-    private readonly settlementService: SettlementService,
+    @Inject('SETTLEMENT_QUEUE') private readonly settlementQueue: Queue,
   ) {}
 
   @Post('quote')
@@ -34,13 +42,10 @@ export class TransferController {
   async createTransfer(@Body() dto: CreateTransferDto) {
     const result = await this.transferService.createTransfer(dto);
 
-    // Look up the full transfer to get the internal ID for settlement
-    const transfer = await this.transferService.getByTrackingCode(
-      result.trackingCode,
-    );
-
-    // Run settlement synchronously in the API process
-    await this.settlementService.orchestrate(transfer.id);
+    // Dispatch settlement to BullMQ worker (async — instant response)
+    await this.settlementQueue.add('settlement', {
+      transferId: result.trackingCode,
+    });
 
     return result;
   }

@@ -37,7 +37,23 @@ import { BifastSimulator } from './bifast.simulator';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'SETTLEMENT_QUEUE',
+      useFactory: (configService: ConfigService) => {
+        return new Queue('settlement', {
+          defaultJobOptions: {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 2000 },
+          },
+          connection: {
+            host: configService.get<string>('REDIS_HOST', 'localhost'),
+            port: configService.get<number>('REDIS_PORT', 6380),
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
   ],
-  exports: [SettlementService],
+  exports: [SettlementService, 'SETTLEMENT_QUEUE'],
 })
 export class SettlementModule {}
