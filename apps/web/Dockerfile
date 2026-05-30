@@ -23,11 +23,9 @@ COPY apps/web/tsconfig.json ./apps/web/tsconfig.json
 COPY apps/web/eslint.config.js ./apps/web/eslint.config.js
 COPY apps/web/components.json ./apps/web/components.json
 COPY apps/web/postcss.config.mjs ./apps/web/postcss.config.mjs
-COPY apps/web/tailwind.config.ts ./apps/web/tailwind.config.ts
 COPY packages/ui/src ./packages/ui/src
 COPY packages/ui/tsconfig.json ./packages/ui/tsconfig.json
 COPY packages/ui/postcss.config.mjs ./packages/ui/postcss.config.mjs
-COPY packages/ui/tailwind.config.ts ./packages/ui/tailwind.config.ts
 COPY packages/ui/eslint.config.js ./packages/ui/eslint.config.js
 COPY packages/shared/src ./packages/shared/src
 COPY packages/shared/tsconfig.json ./packages/shared/tsconfig.json
